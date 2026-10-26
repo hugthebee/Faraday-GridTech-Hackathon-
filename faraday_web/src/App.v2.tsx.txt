@@ -1,0 +1,351 @@
+import { useEffect, useRef, useState } from "react";
+import { exportUrl, getMeta, getReport, recommend, REQ_KEYS, verifyExport } from "./api";
+import type { Flag, Meta, Mode, Option, Power, ReqKey, Reqs, Report, Result, Stress, Verify, YearRow } from "./api";
+
+const IMG = {
+  hero: "/faraday-hero.png",
+  wind: "/faraday-grid-map.jpg",
+  solar: "/faraday-server-light.jpg",
+  plant: "/faraday-transmission.jpg",
+  battery: "/faraday-server-dark.jpg",
+};
+
+type Page = "overview" | "intelligence";
+
+function Bolt() {
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.4 1 4 13h6.7L9.6 23 20 9.2h-7.1L13.4 1Z" /></svg>;
+}
+
+function SectionHead({ label, number }: { label: string; number: string }) {
+  return <div className="section-head"><span>{label}</span><span>{number}</span></div>;
+}
+
+function Count({ children }: { children: React.ReactNode }) {
+  return <strong className="display count">{children}</strong>;
+}
+
+function App() {
+  const [page, setPage] = useState<Page>("overview");
+  return (
+    <div className="app-shell">
+      <header className="nav">
+        <button className="brand" onClick={() => setPage("overview")} aria-label="Faraday home"><Bolt /><span>FARADAY</span></button>
+        <nav aria-label="Main navigation">
+          <button className={page === "overview" ? "active" : ""} onClick={() => setPage("overview")}>Overview</button>
+          <button className={page === "intelligence" ? "active" : ""} onClick={() => setPage("intelligence")}>Power Intelligence</button>
+        </nav>
+      </header>
+      <main>{page === "overview" ? <Overview openModel={() => setPage("intelligence")} /> : <Intelligence />}</main>
+      <footer><div className="brand"><Bolt /><span>FARADAY</span></div><span>Power decisions for the grid-constrained era.</span><span>© 2025</span></footer>
+    </div>
+  );
+}
+
+function Overview({ openModel }: { openModel: () => void }) {
+  const steps = ["Understand the customer", "Build the portfolios", "Simulate every hour", "Recommend and explain"];
+  return <>
+    <section className="hero">
+      <div className="hero-photo" style={{ backgroundImage: `url(${IMG.hero})` }} />
+      <div className="hero-shade" />
+      <div className="hero-content reveal">
+        <p className="eyebrow">Faraday · power intelligence for data centers</p>
+        <h1 className="display">FARADAY TURNS A POWER PROBLEM <em>INTO A</em> DECISION.</h1>
+        <p className="lede">Choose a defensible energy portfolio for the years between campus readiness and grid connection—modeled hour by hour, explained in plain language.</p>
+        <div className="actions"><button className="primary" onClick={openModel}>Open Power Intelligence <span>↗</span></button><button className="outline" onClick={() => document.querySelector("#problem")?.scrollIntoView({ behavior: "smooth" })}>How it works</button></div>
+        <div className="stats">
+          <div><Count>87,600</Count><span>hours simulated</span></div>
+          <div><Count>7+</Count><span>power resources</span></div>
+          <div><Count>3</Count><span>trade-offs · speed, cost, carbon</span></div>
+        </div>
+      </div>
+    </section>
+    <div className="ticker">
+      <div className="ticker-track">
+        {[0, 1].map(group => (
+          <div className="ticker-group" key={group} aria-hidden={group === 1}>
+            {["EIA", "ERCOT", "EPA eGRID", "NREL ATB", "EPA CHP CATALOG"].map(source => <span key={source}>{source}</span>)}
+          </div>
+        ))}
+      </div>
+    </div>
+    <section className="section" id="problem">
+      <SectionHead label="The problem" number="01" />
+      <div className="split intro-grid">
+        <div><h2 className="display">THE CAMPUS IS READY <em>BEFORE THE GRID IS.</em></h2><p className="lede dark">Interconnection queues move slowly. Compute demand does not. Faraday makes the waiting period a solvable portfolio decision—not a construction delay.</p></div>
+        <GridStep />
+      </div>
+    </section>
+    <section className="section">
+      <SectionHead label="What Faraday does" number="02" />
+      <div className="cards four">
+        {steps.map((x,i) => <article className="card process" key={x}><img src={[IMG.hero,IMG.plant,IMG.wind,IMG.battery][i]} alt="" /><span className="mono">0{i+1}</span><h3>{x}</h3><p>{["Translate business priorities into measurable constraints.","Combine grid, onsite, and contracted energy options.","Test cost, carbon, reliability, and maintenance across 87,600 hours.","Surface one recommendation with the trade-offs made explicit."][i]}</p></article>)}
+      </div>
+    </section>
+    <section className="section">
+      <SectionHead label="What you get" number="03" />
+      <div className="split">
+        <h2 className="display">ONE DECISION.<br/><em>EVERY TRADE-OFF<br/>ACCOUNTED FOR.</em></h2>
+        <div className="card list">{["Recommended portfolio","Speed to power","10-year cost incl. maintenance","Carbon intensity","Reliability under grid stress","Checked portfolio.json + dispatch.csv"].map((x,i)=><div key={x}><span>0{i+1}</span><b>{x}</b><span>↗</span></div>)}</div>
+      </div>
+    </section>
+    <section className="photo-strip">{[["Wind · West Texas",IMG.wind],["Solar · utility scale",IMG.solar],["Firm power · nuclear",IMG.plant],["Onsite backup",IMG.battery]].map(([x,img])=><figure key={x}><img src={img} alt={x}/><figcaption>{x}</figcaption></figure>)}</section>
+    <section className="section">
+      <SectionHead label="Built on public data" number="04" />
+      <div className="cards four source-cards">{[["EIA","Fuel prices, power markets, and generation."],["ERCOT","Grid conditions and regional load."],["EPA","Emissions factors and CHP performance."],["NREL","Technology costs and operating assumptions."]].map(([a,b])=><article className="card" key={a}><span className="tag">PUBLIC SOURCE</span><h3>{a}</h3><p>{b}</p></article>)}</div>
+      <p className="footnote">Methodology note · The campus is a fictional benchmark case. Public sources are cited; assumptions remain editable.</p>
+    </section>
+    <section className="section"><div className="dark-card"><span className="tag">START A SCENARIO</span><h2 className="display">READY TO PLAN<br/>THE CAMPUS?</h2><button className="light" onClick={openModel}>Open Power Intelligence <span>↗</span></button></div></section>
+  </>;
+}
+
+function GridStep() {
+  return <div className="card chart-card"><div className="chart-title"><span>Grid import</span><span>MW</span></div><div className="step-chart"><div className="y-axis"><span>75</span><span>50</span><span>25</span><span>0</span></div>{[0,25,50,75].map((v,i)=><div className="step" key={v}><span>{v} MW</span><i style={{ height: `${Math.max(v,2)}%` }}/><small>{["M0–17","M18","M24","M30"][i]}</small></div>)}</div><p className="axis-label">Development month →</p></div>;
+}
+
+const TITLES: Record<ReqKey, string> = { speed: "Speed to power", carbon: "Carbon limit", cost: "Cost limit", reliability: "Reliability" };
+const BLURBS = ["Best overall balance", "Earliest possible service", "Lowest 10-year cost", "Lowest operational carbon"];
+const PRESET_ORDER = ["Balanced", "Speed-first", "Cost-first", "Carbon-first"];
+const SOURCE_CLASS: Record<string, string> = { "PACKET · PUBLIC DATA": "s0", "PACKET · CASE ASSUMPTION": "s1", "TEAM ASSUMPTION": "s2", "NOT MODELED": "s3" };
+const FLAG_LABEL: Record<Flag["status"], string> = { "not-modeled": "NOT MODELED", partial: "PARTIAL", derived: "DERIVED TEXT", definition: "DEFINITION", scope: "NOT IN THIS PAGE" };
+const FLAG_CLASS: Record<Flag["status"], string> = { "not-modeled": "s3", partial: "s3", derived: "s2", definition: "s1", scope: "s0" };
+const STRESS_COLOR: Record<string, string> = { Grid: "#2b2b2b", Gas: "#f7b48a", Battery: "#4fb3a9", Relocated: "#c9c9c6", Interrupted: "#e5484d" };
+
+function FlagPill({ label }: { label: string }) {
+  return <a className="flag-pill" href="#flags" title="The model does not fully produce this. See the list at the bottom of the page.">{label}</a>;
+}
+
+function Intelligence() {
+  const [meta, setMeta] = useState<Meta | null>(null);
+  const [metaError, setMetaError] = useState<string | null>(null);
+  const [persona, setPersona] = useState("Balanced");
+  const [weights, setWeights] = useState<number[]>([34, 33, 33]);
+  const [reqs, setReqs] = useState<Reqs | null>(null);
+  const [monthValue, setMonthValue] = useState(2);
+  const [result, setResult] = useState<Result | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [verify, setVerify] = useState<Verify | "running" | null>(null);
+  const [report, setReport] = useState<Report | null>(null);
+  const seq = useRef(0);
+
+  const applyPreset = (m: Meta, name: string) => {
+    const p = m.presets[name];
+    if (!p) return;
+    setPersona(name); setWeights(p.weights); setReqs(p.requirements); setMonthValue(p.monthValueM);
+  };
+
+  useEffect(() => {
+    getMeta().then(m => { setMeta(m); applyPreset(m, "Balanced"); }).catch(e => setMetaError(e.message));
+  }, []);
+
+  useEffect(() => {
+    if (!meta || !reqs) return;
+    const id = ++seq.current;
+    setBusy(true);
+    const t = setTimeout(() => {
+      recommend({ weights, monthValueM: monthValue, requirements: reqs })
+        .then(r => { if (id === seq.current) { setResult(r); setError(null); setVerify(null); } })
+        .catch(e => { if (id === seq.current) setError(e.message); })
+        .finally(() => { if (id === seq.current) setBusy(false); });
+    }, 250);
+    return () => clearTimeout(t);
+  }, [meta, reqs, weights, monthValue]);
+
+  useEffect(() => {
+    const id = result?.exportId;
+    if (!id) return;
+    let live = true;
+    getReport(id).then(r => { if (live) setReport(r); }).catch(() => { if (live) setReport(null); });
+    return () => { live = false; };
+  }, [result?.exportId]);
+
+  const touch = () => setPersona("Custom");
+  const setReq = (k: ReqKey, patch: Partial<{ choice: number; mode: Mode }>) => { if (reqs) { setReqs({ ...reqs, [k]: { ...reqs[k], ...patch } }); touch(); } };
+  const rec = result?.status === "ok" ? result.recommendation! : null;
+  const peak = meta?.campusPeakMw ?? 75;
+  const connected = !!meta && !metaError;
+
+  if (metaError) {
+    return <section className="section model-hero"><span className="tag orange">MODEL SERVER NOT CONNECTED</span>
+      <h1 className="display">THE MODEL IS <em>NOT RUNNING.</em></h1>
+      <p className="lede dark">{metaError}</p>
+      <p className="footnote">This page shows no numbers of its own: every figure on it comes from the model. Start the server and reload.</p></section>;
+  }
+  if (!meta || !reqs) return <section className="section model-hero"><span className="tag">LOADING THE MODEL</span><h1 className="display">STARTING <em>UP…</em></h1></section>;
+
+  return <>
+    <div className="quick"><span>JUMP TO</span>{["Inputs", "Reliability", "Options"].map(x => <a key={x} href={`#${x.toLowerCase()}`}>{x}</a>)}<a href="#yearly">Year by year</a><a href="#assumptions">Assumptions</a><a href="#flags">Not modeled</a><a className="active" href="#final">Final recommendation</a></div>
+    <section className="model-hero section">
+      <span className="tag orange">{connected ? "MODEL OUTPUT · LIVE" : "NOT CONNECTED"}</span>
+      <h1 className="display">POWER THE CAMPUS <em>BY TRADING</em> MONTHS, DOLLARS <em>AND</em> CARBON.</h1>
+      <div className="stats model-stats"><div><Count>{meta.campusPeakMw.toFixed(0)} MW</Count><span>campus peak</span></div><div><Count>{meta.tier0PeakMw.toFixed(0)} MW</Count><span>protected Tier 0 peak</span></div><div><Count>{meta.months}</Count><span>months modeled</span></div></div>
+      {result?.search && <p className="footnote">{result.search.tested.toLocaleString()} portfolios searched in openings M{meta.window.minOpening}–M{meta.window.maxOpening}, each simulated hour by hour (87,600 hours) · {result.search.passing.toLocaleString()} pass your Priority requirements.</p>}
+      {error && <p className="notice">{error}</p>}
+    </section>
+    <section className="section" id="inputs">
+      <SectionHead label="Customer" number="01" />
+      <div className="customer-grid">
+        <div className="preset-grid">{PRESET_ORDER.filter(x => meta.presets[x]).map((x, i) => <button className={`preset ${persona === x ? "selected" : ""}`} onClick={() => applyPreset(meta, x)} key={x}><span>0{i + 1}</span><b>{x}</b><small>{BLURBS[i]}</small></button>)}</div>
+        <div className="card customer-card"><span className="tag orange">BRIEF EXAMPLE</span><h2>{persona} customer</h2><p>A developer seeking a credible path from first energized building to full campus load. <FlagPill label="static text" /></p><dl><div><dt>Cares about</dt><dd>{persona === "Carbon-first" ? "Emissions, clean share" : "Schedule certainty, economics"}</dd></div><div><dt>Sets</dt><dd>{meta.campusPeakMw.toFixed(0)} MW peak, {meta.tier0PeakMw.toFixed(0)} MW protected load</dd></div><div><dt>Expect</dt><dd>Auditable assumptions and one clear answer</dd></div></dl></div>
+      </div>
+    </section>
+    <section className="section" id="requirements">
+      <SectionHead label="Requirements & priorities" number="02" />
+      <div className="cards four requirement-cards">
+        {REQ_KEYS.map(k => <article className="card" key={k}><label>{TITLES[k]}</label>
+          <select aria-label={TITLES[k]} value={reqs[k].choice} onChange={e => setReq(k, { choice: +e.target.value })}>{meta.requirements[k].options.map((o, n) => <option key={n} value={n}>{o}</option>)}</select>
+          <div className="segment">{(["priority", "preference"] as Mode[]).map(m => <button key={m} className={reqs[k].mode === m ? "on" : ""} onClick={() => setReq(k, { mode: m })}>{m === "priority" ? "Priority" : "Preference"}</button>)}</div></article>)}
+      </div>
+      <p className="footnote">Priority = a hard limit (portfolios that miss it are removed). Preference = a target that adds a bonus to the score when met. <FlagPill label="definition" /></p>
+      <div className="card sliders">{["Speed to power", "Cost", "Carbon"].map((x, i) => <label key={x}><span>{x}<b className="display">{weights[i]}%</b></span><input type="range" min="0" max="100" value={weights[i]} onChange={e => { setWeights(weights.map((w, n) => n === i ? +e.target.value : w)); touch(); }} /></label>)}<label className="month-value"><span>Value of one month earlier ($M)</span><input type="number" min="0" step="1" value={monthValue} onChange={e => { setMonthValue(Math.max(0, +e.target.value || 0)); touch(); }} /></label></div>
+    </section>
+    <div className={busy ? "busy" : ""}>
+    {result?.status === "no_match" && <section className="section"><div className="dark-card"><span className="tag orange">NO PORTFOLIO MEETS EVERY PRIORITY</span><h2 className="display">RELAX ONE OF THE <em>PRIORITIES.</em></h2><p>{(result.relaxations ?? []).join(" ")}</p></div></section>}
+    {rec && result && <>
+    <section className="section">
+      <SectionHead label="Power over time" number="03" />
+      <PowerChart p={result.powerOverTime!} peak={peak} />
+    </section>
+    <section className="section" id="reliability">
+      <SectionHead label="Reliability & maintenance" number="04" />
+      <Reliability r={result.reliability!} />
+    </section>
+    <section className="section" id="options">
+      <SectionHead label="Grid stress & options tested" number="05" />
+      <div className="options-grid"><StressBar s={result.stress!} covered={result.reliability!.tier0ServedAlways} /><Timeline options={result.options!} /></div>
+    </section>
+    {report && <section className="section" id="yearly">
+      <SectionHead label="Year by year" number="06" />
+      <YearByYear r={report} />
+    </section>}</>}
+    </div>
+    <section className="section" id="assumptions">
+      <SectionHead label="Assumptions" number="07" />
+      <div className="card assumption-list">{meta.assumptions.map((a, i) => <div key={a.name}><span>{String(i + 1).padStart(2, "0")}</span><p><b>{a.name}</b><small>{a.detail}</small></p><em className={`source ${SOURCE_CLASS[a.source] ?? "s3"}`}>{a.source}</em></div>)}</div>
+    </section>
+    <div className={busy ? "busy" : ""}>
+    {rec && result && <section className="section" id="final">
+      <SectionHead label="Final recommendation" number="08" />
+      <div className="dark-card recommendation" key={persona + rec.name + rec.opening}><span className="tag orange">FINAL RECOMMENDATION · {persona.toUpperCase()}</span>
+        <h2 className="display">BUILD THE {rec.name.toUpperCase()}: FIRST POWER AT MONTH {rec.opening}, FULL {peak.toFixed(0)} MW AT MONTH {rec.fullDemand}.</h2>
+        <p>{rec.why} <FlagPill label="derived text" /></p>
+        <div className="kpis">{[[`$${rec.kpis.costM.toFixed(0)}M`, "10-yr cost"], [`$${rec.kpis.maintenanceM.toFixed(0)}M`, "maintenance"], [`$${rec.kpis.dollarsPerMwh.toFixed(0)}`, "$/MWh · local energy"], [`${rec.kpis.kgPerMwh.toFixed(0)}`, "kg CO₂/MWh"], [`${rec.kpis.cleanSharePct.toFixed(0)}%`, "clean share"], [`${rec.kpis.onsiteBackupMw.toFixed(0)} MW`, "onsite backup"], [`${rec.kpis.servedTwh.toFixed(1)} TWh`, "energy served"], [`${rec.kpis.interruptedMwh.toFixed(0)}`, "MWh interrupted"]].map(([a, b]) => <div key={b}><Count>{a}</Count><span>{b}</span></div>)}</div>
+        <div className="next"><span>NEXT STEP</span><b>{rec.nextStep}</b></div></div>
+      <div className="below-rec"><div className="card"><span className="tag">SELECTED CAPACITY</span><h3>{rec.capacityText}</h3><p className="footnote">{rec.detail}</p></div>
+        <div className="card"><span className="tag">WHY THIS PORTFOLIO</span><h3>{rec.why}</h3></div></div>
+      <div className="card export-card"><span className="tag">CHECK &amp; EXPORT</span>
+        <div className="export-row"><a className="export-link" href={exportUrl(result.exportId!, "portfolio.json")}>portfolio.json ↓</a><a className="export-link" href={exportUrl(result.exportId!, "dispatch.csv")}>dispatch.csv ↓</a>
+          <button className="export-link" disabled={verify === "running"} onClick={() => { setVerify("running"); verifyExport(result.exportId!).then(setVerify).catch(e => setVerify({ passed: false, error: e.message })); }}>{verify === "running" ? "Checking…" : "Run the official checker"}</button></div>
+        {verify && verify !== "running" && <p className="footnote">{verify.passed ? `Passed the official checker · total decision cost $${verify.totalDecisionCostM?.toFixed(1)}M · ${verify.kgPerMwh?.toFixed(0)} kg CO₂/MWh · full demand month ${verify.fullDemandMonth}.` : `The checker rejected this export: ${verify.error}`}</p>}</div>
+    </section>}
+    </div>
+    <section className="section" id="flags">
+      <SectionHead label="Not produced by the model" number="09" />
+      <p className="lede dark">Everything above comes from the model. These are the places where the page shows something the model does not fully produce, or where it makes a choice you should know about.</p>
+      <div className="card assumption-list flags-list">{meta.flags.map((f, i) => <div key={f.id}><span>{String(i + 1).padStart(2, "0")}</span><p><b>{f.area}</b><small>{f.message}</small></p><em className={`source ${FLAG_CLASS[f.status]}`}>{FLAG_LABEL[f.status]}</em></div>)}</div>
+      {result && result.notes.length > 0 && <div className="card notes-card"><span className="tag orange">NOTES FOR THIS RUN</span>{result.notes.map(n => <p key={n}>{n}</p>)}</div>}
+    </section>
+  </>;
+}
+
+const fmt = (v: number | null | undefined, d = 0) => (v == null ? "–" : v.toLocaleString(undefined, { minimumFractionDigits: d, maximumFractionDigits: d }));
+
+function StackedBars({ r, data, keys, scale, unit, labels }: { r: Report; data: Record<string, (number | null)[]>; keys: string[]; scale: number; unit: string; labels?: (i: number) => string }) {
+  return <div className="bars year-bars"><div className="ylabels">{[1, 2 / 3, 1 / 3, 0].map(f => <span key={f}>{(scale * f).toFixed(0)}</span>)}</div>
+    {r.years.map((y, i) => <div className="bar-col" key={y}><div className="stack">{keys.map(k => (data[k]?.[i] ?? 0) > 0.001 ? <i key={k} style={{ height: `${(data[k][i] ?? 0) / scale * 100}%`, background: r.colors[k] }} title={`${r.names[k]}: ${fmt(data[k][i], 1)} ${unit}`} /> : null)}
+      {labels && <b className="bar-top" style={{ bottom: `calc(${keys.reduce((a, k) => a + (data[k]?.[i] ?? 0), 0) / scale * 100}% + 4px)` }}>{labels(i)}</b>}</div><small>Y{y}</small></div>)}</div>;
+}
+
+function YearByYear({ r }: { r: Report }) {
+  const rows = r.rows.filter(x => x.year !== "horizon");
+  const hor = r.rows.find(x => x.year === "horizon") as YearRow;
+  const sum = (d: Record<string, (number | null)[]>, keys: string[], i: number) => keys.reduce((a, k) => a + (d[k]?.[i] ?? 0), 0);
+  const mixScale = Math.max(...r.years.map((_, i) => sum(r.mix, r.sources.mix, i))) * 1.12;
+  const costScale = Math.max(...r.years.map((_, i) => sum(r.costM, r.sources.cost, i))) * 1.3;
+  const kg = rows.map(x => x.kgPerMwh ?? 0);
+  const kgScale = Math.max(...kg, r.co2Target) * 1.25;
+  const usd = rows.map(x => x.decisionUsdPerMwh ?? 0);
+  const usdScale = Math.max(...usd) * 1.6;
+  const unitCols = Object.keys(r.unit);
+  const allUnit = unitCols.flatMap(c => r.unit[c]).filter((v): v is number => v != null && v > 0);
+  const lo = Math.log10(Math.min(...allUnit)), hi = Math.log10(Math.max(...allUnit));
+  const heat = (v: number | null) => v == null ? "transparent" : `hsl(${120 - 120 * ((Math.log10(v) - lo) / Math.max(1e-9, hi - lo))}, 55%, 82%)`;
+  return <>
+    <div className="card power-chart"><h3 className="chart-h">Where the electricity comes from <small>GWh a year</small></h3>
+      <div className="legend">{r.sources.mix.map(k => <span key={k} style={{ ["--c" as string]: r.colors[k] }} className="lc">{r.names[k]}</span>)}</div>
+      <StackedBars r={r} data={r.mix as Record<string, (number | null)[]>} keys={r.sources.mix} scale={mixScale} unit="GWh" labels={i => `${fmt(rows[i].cleanSharePct)}% clean`} />
+      <p className="axis-label">Model years from development start; a year with no demand is not shown <FlagPill label="scope" /></p></div>
+    <div className="year-pair">
+      <div className="card power-chart"><h3 className="chart-h">What it costs, and who is paid <small>$M a year · dots = $/MWh</small></h3>
+        <div className="legend">{r.sources.cost.map(k => <span key={k} style={{ ["--c" as string]: r.colors[k] }} className="lc">{r.names[k]}</span>)}</div>
+        <div className="bars year-bars"><div className="ylabels">{[1, 2 / 3, 1 / 3, 0].map(f => <span key={f}>{(costScale * f).toFixed(0)}</span>)}</div>
+          {r.years.map((y, i) => <div className="bar-col" key={y}><div className="stack">{r.sources.cost.map(k => (r.costM[k]?.[i] ?? 0) > 0.001 ? <i key={k} style={{ height: `${(r.costM[k][i] ?? 0) / costScale * 100}%`, background: r.colors[k] }} title={`${r.names[k]}: $${fmt(r.costM[k][i], 1)}M`} /> : null)}
+            <b className="bar-top" style={{ bottom: `calc(${sum(r.costM, r.sources.cost, i) / costScale * 100}% + 4px)` }}>${fmt(sum(r.costM, r.sources.cost, i), 1)}M</b>
+            <u className="dot" style={{ bottom: `${usd[i] / usdScale * 100}%` }} title={`$${fmt(usd[i], 0)} per MWh`} /></div><small>Y{y}</small></div>)}</div>
+        <p className="axis-label">Contracts and onsite equipment are paid every year; grid power and gas fuel only when used</p></div>
+      <div className="card power-chart"><h3 className="chart-h">How clean it is <small>kg CO₂ per MWh</small></h3>
+        <div className="legend"><span className="lc" style={{ ["--c" as string]: "#27ae60" }}>At or below {r.co2Target.toFixed(0)}</span><span className="lc" style={{ ["--c" as string]: "#e67e22" }}>Above</span><span className="dash">Selected carbon limit</span></div>
+        <div className="bars year-bars"><div className="ylabels">{[1, 2 / 3, 1 / 3, 0].map(f => <span key={f}>{(kgScale * f).toFixed(0)}</span>)}</div>
+          {r.years.map((y, i) => <div className="bar-col" key={y}><div className="stack"><i style={{ height: `${kg[i] / kgScale * 100}%`, background: kg[i] <= r.co2Target ? "#27ae60" : "#e67e22" }} /><b className="bar-top" style={{ bottom: `calc(${kg[i] / kgScale * 100}% + 4px)` }}>{kg[i].toFixed(0)}</b>
+            <b className="cap-mark" style={{ bottom: `${r.co2Target / kgScale * 100}%` }} /></div><small>Y{y}</small></div>)}</div>
+        <p className="axis-label">Average {fmt(hor.kgPerMwh)} kg/MWh over 10 years · clean share {fmt(hor.cleanSharePct)}%</p></div>
+    </div>
+    <div className="card table-card"><h3 className="chart-h">Results per model year <small>constant 2023 USD · same accounting as the official checker</small></h3>
+      <div className="table-scroll"><table className="year-table"><thead><tr><th>Year</th><th>Requested GWh</th><th>Local energy $M</th><th>Relocation $M</th><th>Interruption $M</th><th>Total $M</th><th>Local $/MWh</th><th>kg CO₂/MWh</th><th>Clean</th><th>Merchant</th></tr></thead>
+        <tbody>{[...rows, hor].map(x => <tr key={String(x.year)} className={x.year === "horizon" ? "total" : ""}><td>{x.year === "horizon" ? "10-year" : `Year ${x.year}`}</td><td>{fmt(x.requestedGwh)}</td><td>{fmt(x.localM, 1)}</td><td>{fmt(x.relocationM, 2)}</td><td>{fmt(x.interruptionM, 2)}</td><td><b>{fmt(x.totalM, 1)}</b></td><td>{fmt(x.localUsdPerMwh, 1)}</td><td>{fmt(x.kgPerMwh)}</td><td>{fmt(x.cleanSharePct)}%</td><td>{fmt(x.merchantSharePct)}%</td></tr>)}</tbody></table></div></div>
+    <div className="card table-card"><h3 className="chart-h">What each source really costs per MWh it delivers <small>$/MWh · green = cheap, red = expensive</small></h3>
+      <div className="table-scroll"><table className="year-table"><thead><tr><th>Year</th>{unitCols.map(c => <th key={c}>{c.replace("Portfolio avg (local $/MWh served)", "Overall average")}</th>)}</tr></thead>
+        <tbody>{r.unitRows.map((u, i) => <tr key={u} className={u === "horizon" ? "total" : ""}><td>{u === "horizon" ? "10-year" : `Year ${u}`}</td>{unitCols.map(c => <td key={c} style={{ background: heat(r.unit[c][i]) }}>{r.unit[c][i] == null ? "–" : `$${fmt(r.unit[c][i], r.unit[c][i]! >= 100 ? 0 : 1)}`}</td>)}</tr>)}</tbody></table></div>
+      <p className="footnote">Includes each source's fixed charges: a source that is paid for but rarely used looks expensive per MWh.</p></div>
+    <div className="card gallery-card"><div className="gallery-head"><div><span className="tag">REPORT VISUALS</span><h3 className="chart-h">The full report, ready for the submission <FlagPill label="notebook style" /></h3></div>
+      <a className="export-link" href={r.zipUrl}>Download report (zip) ↓</a></div>
+      <div className="gallery">{r.images.map(im => <figure key={im.key}><a href={im.url} target="_blank" rel="noreferrer"><img src={im.url} alt={im.title} loading="lazy" /></a><figcaption>{im.title}</figcaption></figure>)}</div>
+      <p className="footnote">The zip holds these images, <b>yearly_results.csv</b> and a plain-language <b>results_summary.md</b> for the recommended portfolio.</p></div>
+  </>;
+}
+
+function Reliability({ r }: { r: NonNullable<Result["reliability"]> }) {
+  const scale = Math.max(r.onsiteBackupMw, r.tier0PeakMw) * 1.15;
+  const cards: [string, string, string | null][] = [
+    [`${r.onsiteBackupMw.toFixed(0)} MW`, "onsite backup · generators + battery", "partial"],
+    [`${r.batteryMwh.toFixed(0)} MWh`, r.batteryMw > 0 ? `battery ride-through · ≈${r.rideThroughMinutes.toFixed(0)} min` : "no battery selected · 0 min ride-through", "partial"],
+    [`$${r.maintenanceM.toFixed(1)}M`, "maintenance · 10 years (fixed + variable O&M)", null],
+    [`${r.stressHoursNoInterruptionPct.toFixed(0)}%`, "grid-stress hours with no interruption", "partial"],
+  ];
+  return <>
+    <div className="cards four stat-cards">{cards.map(([a, b, flag]) => <article className="card" key={b}><Count>{a}</Count><span>{b}</span>{flag && <FlagPill label={flag} />}</article>)}</div>
+    <div className="card reliability"><div><b>Onsite backup</b><span>Generators + battery</span></div><div className="capacity"><i style={{ width: `${Math.min(100, r.onsiteBackupMw / scale * 100)}%` }} /><span style={{ left: `${r.tier0PeakMw / scale * 100}%` }}>{r.tier0PeakMw.toFixed(0)} MW · TIER 0</span></div><Count>{r.onsiteBackupMw.toFixed(0)} MW</Count></div>
+    <p className="footnote">With the largest unit out, firm onsite capacity is {r.backup.firmN1Mw.toFixed(0)} MW against {r.backup.criticalMw.toFixed(1)} MW of protected load{r.backup.shortfallMw > 0.05 ? `, a ${r.backup.shortfallMw.toFixed(1)} MW gap. Closing it with diesel sets would add about $${r.backup.options[1].totalM.toFixed(0)}M over the horizon (team-assumed costs, outside the common cost).` : ", so the protected load is covered."} <FlagPill label="extension" /></p>
+  </>;
+}
+
+function PowerChart({ p, peak }: { p: Power; peak: number }) {
+  const keys: [keyof Power["series"], string][] = [["gas", "Onsite gas"], ["merchant", "Merchant grid"], ["renewables", "Wind + solar"], ["nuclear", "Nuclear"], ["battery", "Battery discharge"]];
+  const used = keys.filter(([k], i) => i < 4 || p.series[k].some(v => v > 0.05));
+  const scale = Math.max(peak, ...p.series.demand);
+  const shed = Math.max(...p.series.relocated, ...p.series.interrupted);
+  return <div className="card power-chart"><div className="legend">{used.map(([k, name], i) => <span key={k} className={`l${i}`}>{name}</span>)}<span className="dash">Grid import cap</span></div>
+    <div className="bars"><div className="ylabels">{[1, 2 / 3, 1 / 3, 0].map(f => <span key={f}>{(scale * f).toFixed(0)}</span>)}</div>
+      {p.months.map((m, j) => <div className="bar-col" key={m}><div className="stack">{used.map(([k], n) => p.series[k][j] > 0.05 ? <i className={`c${n}`} style={{ height: `${p.series[k][j] / scale * 100}%` }} key={k} /> : null)}<b className="cap-mark" style={{ bottom: `${p.series.gridCap[j] / scale * 100}%` }} /></div><small>M{m}</small></div>)}</div>
+    <p className="axis-label">Average MW served in that month (hourly average) · dashed marks = grid import cap <FlagPill label="legend extended" /></p>
+    {shed > 0.05 && <p className="footnote">Relocated or interrupted demand is not supply and is not stacked: up to {Math.max(...p.series.relocated).toFixed(1)} MW relocated and {Math.max(...p.series.interrupted).toFixed(1)} MW interrupted on average in a month.</p>}</div>;
+}
+
+function StressBar({ s, covered }: { s: Stress; covered: boolean }) {
+  const segs: [string, number][] = ([["Grid", s.gridMw], ["Gas", s.gasMw], ["Battery", s.batteryMw], ["Relocated", s.relocatedMw], ["Interrupted", s.interruptedMw]] as [string, number][]).filter(([, v]) => v > 0.05);
+  const total = segs.reduce((a, [, v]) => a + v, 0) || 1;
+  return <div className="card stress"><span className="tag">STRESS HOUR · {s.hour}</span><h3>{s.demandMw.toFixed(0)} MW demand{covered ? ", protected load fully served" : ", protected load NOT fully served"}</h3>
+    <div className="stress-track">{segs.map(([name, v]) => <i key={name} style={{ width: `${v / total * 100}%`, background: STRESS_COLOR[name] }} />)}</div>
+    <div className="stress-legend">{segs.map(([name, v]) => <span key={name}>{name} {v.toFixed(0)}</span>)}</div>
+    <p>The busiest stress hour after full demand: the grid is capped at {s.gridCapMw.toFixed(0)} MW (60%), {s.tier0Mw.toFixed(0)} MW is protected Tier 0. Every portfolio is tested against constrained hours, not only annual averages.</p></div>;
+}
+
+function Timeline({ options }: { options: Option[] }) {
+  const lo = 12, hi = 40, span = hi - lo;
+  return <div className="card timeline"><div className="months">{[12, 20, 28, 36].map(m => <span key={m}>M{m}</span>)}<span>M{hi}</span></div>
+    {options.map(o => <div className="timeline-row" key={o.label}><div className={`timeline-pill ${o.role === "Recommended" ? "winner" : ""}`} style={{ marginLeft: `${(o.opening - lo) / span * 100}%`, width: `${Math.max(40, (o.fullDemand - o.opening) / span * 100)}%` }}>{o.label}<span>{o.tag}</span></div>
+      <small>M{o.opening}→M{o.fullDemand} · ${o.costM.toFixed(0)}M · {o.kgPerMwh.toFixed(0)} kg/MWh · {o.backupMw.toFixed(0)} MW onsite</small><small className="detail">{o.detail}</small></div>)}
+    <p className="footnote">Pills run from first power to full demand. Names are generated from each portfolio's composition. <FlagPill label="derived text" /></p></div>;
+}
+
+export default App;

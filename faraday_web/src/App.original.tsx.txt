@@ -1,0 +1,175 @@
+import { useState } from "react";
+
+const IMG = {
+  hero: "/faraday-hero.png",
+  wind: "/faraday-grid-map.jpg",
+  solar: "/faraday-server-light.jpg",
+  plant: "/faraday-transmission.jpg",
+  battery: "/faraday-server-dark.jpg",
+};
+
+const personas = {
+  Balanced: { first: 20, full: 30, cost: 356, carbon: 218, winner: "Balanced portfolio" },
+  "Speed-first": { first: 14, full: 24, cost: 401, carbon: 286, winner: "Fast-start gas + grid" },
+  "Cost-first": { first: 22, full: 34, cost: 329, carbon: 252, winner: "Merchant-led portfolio" },
+  "Carbon-first": { first: 24, full: 36, cost: 388, carbon: 96, winner: "Clean firm portfolio" },
+};
+
+type Persona = keyof typeof personas;
+type Page = "overview" | "intelligence";
+
+function Bolt() {
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.4 1 4 13h6.7L9.6 23 20 9.2h-7.1L13.4 1Z" /></svg>;
+}
+
+function SectionHead({ label, number }: { label: string; number: string }) {
+  return <div className="section-head"><span>{label}</span><span>{number}</span></div>;
+}
+
+function Count({ children }: { children: React.ReactNode }) {
+  return <strong className="display count">{children}</strong>;
+}
+
+function App() {
+  const [page, setPage] = useState<Page>("overview");
+  return (
+    <div className="app-shell">
+      <header className="nav">
+        <button className="brand" onClick={() => setPage("overview")} aria-label="Faraday home"><Bolt /><span>FARADAY</span></button>
+        <nav aria-label="Main navigation">
+          <button className={page === "overview" ? "active" : ""} onClick={() => setPage("overview")}>Overview</button>
+          <button className={page === "intelligence" ? "active" : ""} onClick={() => setPage("intelligence")}>Power Intelligence</button>
+        </nav>
+      </header>
+      <main>{page === "overview" ? <Overview openModel={() => setPage("intelligence")} /> : <Intelligence />}</main>
+      <footer><div className="brand"><Bolt /><span>FARADAY</span></div><span>Power decisions for the grid-constrained era.</span><span>© 2025</span></footer>
+    </div>
+  );
+}
+
+function Overview({ openModel }: { openModel: () => void }) {
+  const steps = ["Understand the customer", "Build the portfolios", "Simulate every hour", "Recommend and explain"];
+  return <>
+    <section className="hero">
+      <div className="hero-photo" style={{ backgroundImage: `url(${IMG.hero})` }} />
+      <div className="hero-shade" />
+      <div className="hero-content reveal">
+        <p className="eyebrow">Faraday · power intelligence for data centers</p>
+        <h1 className="display">FARADAY TURNS A POWER PROBLEM <em>INTO A</em> DECISION.</h1>
+        <p className="lede">Choose a defensible energy portfolio for the years between campus readiness and grid connection—modeled hour by hour, explained in plain language.</p>
+        <div className="actions"><button className="primary" onClick={openModel}>Open Power Intelligence <span>↗</span></button><button className="outline" onClick={() => document.querySelector("#problem")?.scrollIntoView({ behavior: "smooth" })}>How it works</button></div>
+        <div className="stats">
+          <div><Count>87,600</Count><span>hours simulated</span></div>
+          <div><Count>7+</Count><span>power resources</span></div>
+          <div><Count>3</Count><span>trade-offs · speed, cost, carbon</span></div>
+        </div>
+      </div>
+    </section>
+    <div className="ticker">
+      <div className="ticker-track">
+        {[0, 1].map(group => (
+          <div className="ticker-group" key={group} aria-hidden={group === 1}>
+            {["EIA", "ERCOT", "EPA eGRID", "NREL ATB", "EPA CHP CATALOG"].map(source => <span key={source}>{source}</span>)}
+          </div>
+        ))}
+      </div>
+    </div>
+    <section className="section" id="problem">
+      <SectionHead label="The problem" number="01" />
+      <div className="split intro-grid">
+        <div><h2 className="display">THE CAMPUS IS READY <em>BEFORE THE GRID IS.</em></h2><p className="lede dark">Interconnection queues move slowly. Compute demand does not. Faraday makes the waiting period a solvable portfolio decision—not a construction delay.</p></div>
+        <GridStep />
+      </div>
+    </section>
+    <section className="section">
+      <SectionHead label="What Faraday does" number="02" />
+      <div className="cards four">
+        {steps.map((x,i) => <article className="card process" key={x}><img src={[IMG.hero,IMG.plant,IMG.wind,IMG.battery][i]} alt="" /><span className="mono">0{i+1}</span><h3>{x}</h3><p>{["Translate business priorities into measurable constraints.","Combine grid, onsite, and contracted energy options.","Test cost, carbon, reliability, and maintenance across 87,600 hours.","Surface one recommendation with the trade-offs made explicit."][i]}</p></article>)}
+      </div>
+    </section>
+    <section className="section">
+      <SectionHead label="What you get" number="03" />
+      <div className="split">
+        <h2 className="display">ONE DECISION.<br/><em>EVERY TRADE-OFF<br/>ACCOUNTED FOR.</em></h2>
+        <div className="card list">{["Recommended portfolio","Speed to power","10-year cost incl. maintenance","Carbon intensity","Reliability under grid stress","Checked portfolio.json + dispatch.csv"].map((x,i)=><div key={x}><span>0{i+1}</span><b>{x}</b><span>↗</span></div>)}</div>
+      </div>
+    </section>
+    <section className="photo-strip">{[["Wind · West Texas",IMG.wind],["Solar · utility scale",IMG.solar],["Firm power · nuclear",IMG.plant],["Onsite backup",IMG.battery]].map(([x,img])=><figure key={x}><img src={img} alt={x}/><figcaption>{x}</figcaption></figure>)}</section>
+    <section className="section">
+      <SectionHead label="Built on public data" number="04" />
+      <div className="cards four source-cards">{[["EIA","Fuel prices, power markets, and generation."],["ERCOT","Grid conditions and regional load."],["EPA","Emissions factors and CHP performance."],["NREL","Technology costs and operating assumptions."]].map(([a,b])=><article className="card" key={a}><span className="tag">PUBLIC SOURCE</span><h3>{a}</h3><p>{b}</p></article>)}</div>
+      <p className="footnote">Methodology note · The campus is a fictional benchmark case. Public sources are cited; assumptions remain editable.</p>
+    </section>
+    <section className="section"><div className="dark-card"><span className="tag">START A SCENARIO</span><h2 className="display">READY TO PLAN<br/>THE CAMPUS?</h2><button className="light" onClick={openModel}>Open Power Intelligence <span>↗</span></button></div></section>
+  </>;
+}
+
+function GridStep() {
+  return <div className="card chart-card"><div className="chart-title"><span>Grid import</span><span>MW</span></div><div className="step-chart"><div className="y-axis"><span>75</span><span>50</span><span>25</span><span>0</span></div>{[0,25,50,75].map((v,i)=><div className="step" key={v}><span>{v} MW</span><i style={{ height: `${Math.max(v,2)}%` }}/><small>{["M0–17","M18","M24","M30"][i]}</small></div>)}</div><p className="axis-label">Development month →</p></div>;
+}
+
+function Intelligence() {
+  const [persona, setPersona] = useState<Persona>("Balanced");
+  const [weights, setWeights] = useState([40,35,25]);
+  const p = personas[persona];
+  return <>
+    <div className="quick"><span>JUMP TO</span>{["Inputs","Reliability","Options","Assumptions"].map(x=><a key={x} href={`#${x.toLowerCase()}`}>{x}</a>)}<a className="active" href="#final">Final recommendation</a></div>
+    <section className="model-hero section">
+      <span className="tag orange">SAMPLE NUMBERS, NOT MODEL OUTPUT</span>
+      <h1 className="display">POWER THE CAMPUS <em>BY TRADING</em> MONTHS, DOLLARS <em>AND</em> CARBON.</h1>
+      <div className="stats model-stats"><div><Count>75 MW</Count><span>campus peak</span></div><div><Count>51 MW</Count><span>protected Tier 0 peak</span></div><div><Count>120</Count><span>months modeled</span></div></div>
+    </section>
+    <section className="section" id="inputs">
+      <SectionHead label="Customer" number="01" />
+      <div className="customer-grid">
+        <div className="preset-grid">{(Object.keys(personas) as Persona[]).map((x,i)=><button className={`preset ${persona===x?"selected":""}`} onClick={()=>setPersona(x)} key={x}><span>0{i+1}</span><b>{x}</b><small>{["Best overall balance","Earliest possible service","Lowest 10-year cost","Lowest operational carbon"][i]}</small></button>)}</div>
+        <div className="card customer-card"><span className="tag orange">BRIEF EXAMPLE</span><h2>{persona} customer</h2><p>A developer seeking a credible path from first energized building to full campus load.</p><dl><div><dt>Cares about</dt><dd>{persona === "Carbon-first" ? "Emissions, clean share" : "Schedule certainty, economics"}</dd></div><div><dt>Sets</dt><dd>75 MW peak, 51 MW protected load</dd></div><div><dt>Expect</dt><dd>Auditable assumptions and one clear answer</dd></div></dl></div>
+      </div>
+    </section>
+    <section className="section" id="requirements">
+      <SectionHead label="Requirements & priorities" number="02" />
+      <div className="cards four requirement-cards">
+        {["Speed to power","Carbon limit","Cost limit","Reliability"].map((x,i)=><article className="card" key={x}><label>{x}</label><select aria-label={x}><option>{["M14 → M24","200 kg CO₂/MWh","20% above cheapest","Tier 2 · Allowed"][i]}</option><option>{["M26 → M36","100 kg CO₂/MWh","10% above cheapest","Tier 2 · Never"][i]}</option></select><div className="segment"><button className="on">Priority</button><button>Preference</button></div></article>)}
+      </div>
+      <div className="card sliders">{["Speed to power","Cost","Carbon"].map((x,i)=><label key={x}><span>{x}<b className="display">{weights[i]}%</b></span><input type="range" min="0" max="100" value={weights[i]} onChange={e=>setWeights(weights.map((w,n)=>n===i?+e.target.value:w))}/></label>)}<label className="month-value"><span>Value of one month earlier ($M)</span><input type="number" defaultValue="8"/></label></div>
+    </section>
+    <section className="section">
+      <SectionHead label="Power over time" number="03" />
+      <PowerChart />
+    </section>
+    <section className="section" id="reliability">
+      <SectionHead label="Reliability & maintenance" number="04" />
+      <div className="cards four stat-cards">{[["52 MW","onsite backup"],["48 MWh","battery ride-through · ≈52 min"],["$12M","maintenance · 10 years"],["100%","grid-stress hours covered"]].map(([a,b])=><article className="card" key={b}><Count>{a}</Count><span>{b}</span></article>)}</div>
+      <div className="card reliability"><div><b>Onsite backup</b><span>Generators + battery</span></div><div className="capacity"><i/><span style={{left:"85%"}}>51 MW · TIER 0</span></div><Count>52 MW</Count></div>
+    </section>
+    <section className="section" id="options">
+      <SectionHead label="Grid stress & options tested" number="05" />
+      <div className="options-grid"><StressBar/><Timeline persona={persona}/></div>
+    </section>
+    <section className="section" id="assumptions">
+      <SectionHead label="Assumptions" number="06" />
+      <div className="card assumption-list">{["Campus demand ramp","ERCOT grid emissions","Natural gas price","Fuel cell heat rate","Solar capacity factor","Wind generation profile","Battery round-trip efficiency","Maintenance intervals","Grid import schedule","Relocated load value"].map((x,i)=><div key={x}><span>0{i+1}</span><p><b>{x}</b><small>{i%2 ? "Regional public benchmark, editable by the team." : "Case input supplied in the customer packet."}</small></p><em className={`source s${i%4}`}>{["PACKET · PUBLIC DATA","PACKET · CASE ASSUMPTION","TEAM ASSUMPTION","PLACEHOLDER"][i%4]}</em></div>)}</div>
+    </section>
+    <section className="section" id="final">
+      <SectionHead label="Final recommendation" number="07" />
+      <div className="dark-card recommendation" key={persona}><span className="tag orange">FINAL RECOMMENDATION · {persona.toUpperCase()}</span><h2 className="display">BUILD THE {p.winner.toUpperCase()}: FIRST POWER AT MONTH {p.first}, FULL 75 MW AT MONTH {p.full}.</h2><p>It beats the runner-up on the weighted objective while keeping grid-stress exposure fully covered.</p><div className="kpis">{[[`$${p.cost}M`,"10-yr cost"],["$12M","maintenance"],["$74","$/MWh"],[`${p.carbon}`,"kg CO₂/MWh"],["46%","clean share"],["52 MW","onsite backup"],["5.1 TWh","energy served"],["0","MWh interrupted"]].map(([a,b])=><div key={b}><Count>{a}</Count><span>{b}</span></div>)}</div><div className="next"><span>NEXT STEP</span><b>Validate utility milestones and issue an RFP for 52 MW of firm onsite capacity.</b></div></div>
+      <div className="below-rec"><div className="card"><span className="tag">SELECTED CAPACITY</span><h3>52 MW firm · 48 MWh battery · 38 MW contracted clean</h3></div><div className="card"><span className="tag">WHY THIS PORTFOLIO</span><h3>It protects the schedule without overbuilding for a temporary grid constraint.</h3></div></div>
+    </section>
+  </>;
+}
+
+function PowerChart() {
+  const bars = [[12,0,0,0],[22,8,0,0],[26,14,7,3],[24,20,12,9],[18,25,17,15],[8,30,20,17]];
+  return <div className="card power-chart"><div className="legend">{["Onsite gas","Merchant grid","Wind + solar","Nuclear"].map((x,i)=><span key={x} className={`l${i}`}>{x}</span>)}<span className="dash">Grid import cap</span></div><div className="bars"><div className="ylabels"><span>75</span><span>50</span><span>25</span><span>0</span></div>{bars.map((vals,i)=><div className="bar-col" key={i}><div className="stack">{vals.map((v,n)=><i className={`c${n}`} style={{height:`${v/75*100}%`}} key={n}/>)}</div><small>M{[14,20,30,42,60,90][i]}</small></div>)}<div className="cap-line"><span>GRID CAP</span></div></div><p className="axis-label">Average MW served (hourly average)</p></div>;
+}
+
+function StressBar() {
+  return <div className="card stress"><span className="tag">STRESS HOUR · 17:00</span><h3>75 MW demand remains served</h3><div className="stress-track"><i/><i/><i/><i/></div><div className="stress-legend"><span>Grid 45</span><span>Gas 20</span><span>Battery 7</span><span>Relocated 3</span></div><p>Faraday tests each portfolio against constrained grid hours, not only annual averages.</p></div>;
+}
+
+function Timeline({ persona }: { persona: Persona }) {
+  const rows = ["Balanced portfolio","Fast-start gas + grid","Merchant-led portfolio","Clean firm portfolio"];
+  return <div className="card timeline"><div className="months"><span>M12</span><span>M20</span><span>M28</span><span>M36</span></div>{rows.map((x,i)=><div className="timeline-row" key={x}><div className={`timeline-pill ${x===personas[persona].winner?"winner":""}`} style={{marginLeft:`${i*5}%`,width:`${74-i*5}%`}}>{x}<span>{x===personas[persona].winner?"RECOMMENDED":i===3?"CARBON MATCH":"NO MATCH"}</span></div><small>${[356,401,329,388][i]}M · {[218,286,252,96][i]} kg/MWh · {52-i*3} MW backup</small></div>)}</div>;
+}
+
+export default App;
