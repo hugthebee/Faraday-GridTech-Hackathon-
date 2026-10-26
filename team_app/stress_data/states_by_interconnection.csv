@@ -1,0 +1,59 @@
+interconnection_area,state,postal_code,coverage
+Eastern Interconnection,Alabama,AL,Whole or nearly whole state
+Eastern Interconnection,Arkansas,AR,Whole or nearly whole state
+Eastern Interconnection,Connecticut,CT,Whole or nearly whole state
+Eastern Interconnection,Delaware,DE,Whole or nearly whole state
+Eastern Interconnection,Florida,FL,Whole or nearly whole state
+Eastern Interconnection,Georgia,GA,Whole or nearly whole state
+Eastern Interconnection,Illinois,IL,Whole or nearly whole state
+Eastern Interconnection,Indiana,IN,Whole or nearly whole state
+Eastern Interconnection,Iowa,IA,Whole or nearly whole state
+Eastern Interconnection,Kansas,KS,Whole or nearly whole state
+Eastern Interconnection,Kentucky,KY,Whole or nearly whole state
+Eastern Interconnection,Louisiana,LA,Whole or nearly whole state
+Eastern Interconnection,Maine,ME,Whole or nearly whole state
+Eastern Interconnection,Maryland,MD,Whole or nearly whole state
+Eastern Interconnection,Massachusetts,MA,Whole or nearly whole state
+Eastern Interconnection,Michigan,MI,Whole or nearly whole state
+Eastern Interconnection,Minnesota,MN,Whole or nearly whole state
+Eastern Interconnection,Mississippi,MS,Whole or nearly whole state
+Eastern Interconnection,Missouri,MO,Whole or nearly whole state
+Eastern Interconnection,New Hampshire,NH,Whole or nearly whole state
+Eastern Interconnection,New Jersey,NJ,Whole or nearly whole state
+Eastern Interconnection,New York,NY,Whole or nearly whole state
+Eastern Interconnection,North Carolina,NC,Whole or nearly whole state
+Eastern Interconnection,North Dakota,ND,Whole or nearly whole state
+Eastern Interconnection,Ohio,OH,Whole or nearly whole state
+Eastern Interconnection,Oklahoma,OK,Whole or nearly whole state
+Eastern Interconnection,Pennsylvania,PA,Whole or nearly whole state
+Eastern Interconnection,Rhode Island,RI,Whole or nearly whole state
+Eastern Interconnection,South Carolina,SC,Whole or nearly whole state
+Eastern Interconnection,Tennessee,TN,Whole or nearly whole state
+Eastern Interconnection,Vermont,VT,Whole or nearly whole state
+Eastern Interconnection,Virginia,VA,Whole or nearly whole state
+Eastern Interconnection,West Virginia,WV,Whole or nearly whole state
+Eastern Interconnection,Wisconsin,WI,Whole or nearly whole state
+Eastern Interconnection,District of Columbia,DC,Whole (not a state)
+Eastern Interconnection,Nebraska,NE,Most of state (panhandle area is Western)
+Eastern Interconnection,South Dakota,SD,Most of state (western part is Western)
+Eastern Interconnection,Texas,TX,Small parts only (panhandle and east/northeast Texas)
+Eastern Interconnection,Colorado,CO,Eastern plains only
+Eastern Interconnection,Montana,MT,Eastern edge only
+Eastern Interconnection,New Mexico,NM,Eastern edge only
+Western Interconnection,Arizona,AZ,Whole
+Western Interconnection,California,CA,"Whole (excluding small non-synchronous areas, if any)"
+Western Interconnection,Idaho,ID,Whole
+Western Interconnection,Nevada,NV,Whole
+Western Interconnection,Oregon,OR,Whole
+Western Interconnection,Utah,UT,Whole
+Western Interconnection,Washington,WA,Whole
+Western Interconnection,Wyoming,WY,Whole or nearly whole
+Western Interconnection,Colorado,CO,Most of state (eastern plains are Eastern)
+Western Interconnection,Montana,MT,Most of state (eastern edge is Eastern)
+Western Interconnection,New Mexico,NM,Most of state (eastern edge is Eastern)
+Western Interconnection,Nebraska,NE,Small part (panhandle area)
+Western Interconnection,South Dakota,SD,Small part (western area)
+Western Interconnection,Texas,TX,Small part (El Paso area)
+ERCOT (Texas Interconnection),Texas,TX,Most of state (about 90% of load); not the whole state
+Quebec Interconnection,(none),,Canadian province only; no US states
+"Alaska (separate, not synchronized with the lower-48 grids)",Alaska,AK,"Whole; Alaska's systems are not part of the Eastern, Western or ERCOT grids"
