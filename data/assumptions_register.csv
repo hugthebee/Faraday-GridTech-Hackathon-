@@ -1,0 +1,35 @@
+parameter,value,unit,classification,rationale
+tier1_base_share,0.24,fraction,CASE assumption,Proposed bounded benchmark; not measured industrial practice.
+tier1_daily_amplitude,0.04,fraction,CASE assumption,Proposed bounded benchmark; not measured industrial practice.
+tier1_weekly_amplitude,0.02,fraction,CASE assumption,Proposed bounded benchmark; not measured industrial practice.
+tier2_base_share,0.12,fraction,CASE assumption,Proposed bounded benchmark; not measured industrial practice.
+tier2_daily_amplitude,0.025,fraction,CASE assumption,Proposed bounded benchmark; not measured industrial practice.
+tier2_weekly_amplitude,0.015,fraction,CASE assumption,Proposed bounded benchmark; not measured industrial practice.
+protected_infrastructure_floor_mw,10.0,MW,CASE assumption,Proposed bounded benchmark; not measured industrial practice.
+relocation_notice_minutes,30.0,minutes,CASE assumption,Proposed bounded benchmark; not measured industrial practice.
+remote_capacity_mw,12.0,MW,CASE assumption,Proposed bounded benchmark; not measured industrial practice.
+remote_energy_multiplier,1.05,ratio,CASE assumption,Proposed bounded benchmark; not measured industrial practice.
+remote_electricity_usd_per_mwh,70.0,2023 USD/MWh,CASE assumption,"Fictional 70 USD/MWh remote tariff, not an observed retail price or verified service quote."
+relocation_service_usd_per_local_mwh,50.0,2023 USD/MWh,CASE assumption,"Fictional 50 USD per relocated local MWh service charge, not an observed provider quote."
+remote_co2_t_per_mwh,0.33287420383294,tCO2/MWh,CASE assumption,Proposed bounded benchmark; not measured industrial practice.
+interruption_consequence_usd_per_mwh,1000.0,2023 USD/MWh,CASE assumption,Fictional service consequence: 1 USD/kWh interrupted; not observed revenue loss.
+stress_import_fraction,0.6,fraction,CASE assumption,Proposed bounded benchmark; not measured industrial practice.
+maximum_event_duration_hours,7.0,hours,CASE assumption,Proposed bounded benchmark; not measured industrial practice.
+tier2_max_fraction,1.0,fraction,CASE assumption,Proposed bounded benchmark; not measured industrial practice.
+nuclear_available_month,60.0,elapsed months,CASE assumption,Future physical PPA; no reactor construction model.
+nuclear_payment_usd_per_mwh,95.0,2023 USD/MWh,CASE offer,Retained hypothetical offer; not a new-nuclear quote.
+nuclear_max_mw,25.0,MW,CASE offer,Retained delivered quantity; shares campus import limit.
+grid_delay_months,0,elapsed months,CASE base setting,Required base comparison is zero grid delay. Any nonnegative integer is optional sensitivity; six months is illustrative only. Resource dates stay fixed.
+horizon_months,120,model months,CASE assumption,Five years after month60 supply arrival; no optimal horizon claim.
+hours_per_model_month,730,hours,CASE assumption,Equal-month screening clock keeps12months=8760hours; not Gregorian timing.
+default_initial_service_month,20,elapsed months,CASE assumption,Default customer schedule; teams can evaluate alternatives.
+initial_load_fraction,0.3333333333333333,fraction,CASE assumption,One-third mature demand at opening; ten-month ramp in 1/15 increments reaches full demand at start+10.
+onsite_energy_land_acres,8,acres,CASE assumption,"Fictional usable equipment envelope, not a verified parcel or engineering layout."
+gas_engine_land_acres_per_mw,0.05,acres/MW,CASE assumption,Fictional allowance with compact Wartsila project context.
+fuel_cell_land_acres_per_mw,0.05,acres/MW,CASE assumption,Fictional allowance with Bloom CCHP datasheet context.
+cost_start_rule,"max(service,availability)",month,CASE assumption,Charges continue for selected capacity even if displaced by later supply.
+profile_repetition,same2023year,rule,CASE assumption,No fabricated future forecasts; reproducible aligned screening sequence.
+terminal_value,0,USD credit,CASE assumption,"No terminal credits; uses annualized capital charges, not upfront CAPEX/NPV."
+wholesale_energy_annual_real_rate,0.05,fraction/yr real,CASE assumption,"Smooth scenario below the Modo Energy Oct 2026 ERCOT central path (about 36 USD/MWh in 2027 to a peak near 150 in 2032, real 2025 USD); reflects data-center-driven tightening. Not a forecast."
+henry_hub_annual_real_rate,0.03,fraction/yr real,CASE assumption,"EIA AEO2025 Reference rises about 2.1%/yr real (2.88 to 4.80 USD/MMBtu, 2025-2050); 2026-27 STEO is already above the 2023 base, so a slightly faster start-anchored path is used."
+grid_co2_annual_rate,-0.03,fraction/yr,CASE assumption,"ERCOT intensity fell about 3.5-4%/yr 2010-2023 (1,206 to 850 to 734 lb/MWh); -3%/yr is conservative given data-center load growth. Applies to the remote site as well."

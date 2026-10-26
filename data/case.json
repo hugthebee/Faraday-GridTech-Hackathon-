@@ -1,0 +1,88 @@
+{
+  "version": "v5.5.1",
+  "status": "Fictional shared exercise benchmark; see documented assumptions and limitations.",
+  "reference_year": 2023,
+  "hourly_year_role": "historical stress and screening year; not a future price forecast",
+  "site": "Fictional Williamson County, Texas campus",
+  "load_boundary": "total facility AC demand including cooling; do not multiply by PUE",
+  "peak_mw": 75,
+  "annual_load_factor": 0.92,
+  "campus_ready_month": 14,
+  "full_load_target_month": 30,
+  "onsite_energy_land_acres": 8,
+  "discount_rate_real": 0.08,
+  "money_basis": "2023 USD benchmark; contract prices and adders are fictional in the same dollar basis",
+  "grid_access": [
+    {
+      "from_month": 0,
+      "max_import_mw": 0
+    },
+    {
+      "from_month": 18,
+      "max_import_mw": 25
+    },
+    {
+      "from_month": 24,
+      "max_import_mw": 50
+    },
+    {
+      "from_month": 30,
+      "max_import_mw": 75
+    }
+  ],
+  "grid_access_note": "Fictional campus import limit; all offsite resources share it. Not confirmed utility service.",
+  "grid_co2_t_per_mwh": 0.33287420383294,
+  "egrid_co2_lb_per_mwh": 733.862,
+  "grid_clean_credit": 0,
+  "reliability_scope": "hourly adequacy only; UPS and emergency protection outside scope",
+  "storage_charge_rule": "only from clean portfolio generation; no grid/fossil charging or storage-to-storage transfers",
+  "optional_constraints": [
+    "unit commitment",
+    "minimum stable output",
+    "startup cost",
+    "subhourly ramping",
+    "temperature derating",
+    "degradation",
+    "stochastic outages",
+    "optimized staged capacity additions",
+    "detailed workload scheduling"
+  ],
+  "shared_hard_constraints": [
+    "hourly energy balance",
+    "resource available dates",
+    "grid import limit",
+    "resource capacity and module increments",
+    "onsite land",
+    "storage power/energy/efficiency/cycles",
+    "Tier0 protection",
+    "event eligibility and response limits",
+    "temporary import caps",
+    "remote capacity"
+  ],
+  "preferences": "Teams design input and recommendation logic; objective weights are not prescribed.",
+  "emissions_metric_note": "Attributable screening CO2 indicator, not a site-specific physical inventory or marginal avoided emissions.",
+  "gas_connection_note": "Gas turbine, gas engine and natural-gas fuel cell assume delivered fuel infrastructure is ready at each resource available_month. Dates are hypothetical offers, not installation-speed or gas-connection forecasts.",
+  "price_geography_note": "LZ_SOUTH is a regional ERCOT price proxy, not a verified Williamson County settlement point.",
+  "load_tier_boundary": "Net local facility AC demand, including allocated cooling. Essential infrastructure remains protected. No extra PUE multiplier.",
+  "nuclear_note": "Hypothetical physical delivery from a new offsite plant available at month 60; 25 MW maximum and 95 USD/MWh are fictional case offers, not supplier quotations or a nuclear project-cost forecast.",
+  "scope": "Chronological hourly commissioning and operation",
+  "horizon_months": 120,
+  "hours_per_year": 8760,
+  "hours_per_model_month": 730,
+  "default_initial_service_month": 20,
+  "default_full_demand_month": 30,
+  "ramp_duration_months": 10,
+  "initial_load_fraction": 0.3333333333333333,
+  "time_convention": "120 equal model months of730hours. Month0 starts at model_hour0. Year1 is months0..11. No future calendar/DST forecast implied; reference_hour=model_hour%8760.",
+  "profile_repetition": "Repeat the same 2023 reference year 10 times for hourly shape, including stress windows and price/renewable coincidence. Merchant wholesale price, Henry Hub gas price and grid CO2 follow the smooth real-terms path in data/price_trajectory.json (constant 2023 USD). No weather diversification, demand randomness or probability implied.",
+  "cost_start_rule": "For each selected resource, charges and availability begin at max(initial_service_month,available_month). Capacity is selected upfront and remains committed through horizon end.",
+  "cost_comparison": "Sum common annualized capacity charges prorated by operating hours plus energy/response charges; no second discounting or terminal value. This is a cumulative screening cost, NOT project NPV.",
+  "commitment_rule": "No retirement, resale, cancellation, replacements or optional retirement credits in core model. All lives exceed ten-year horizon.",
+  "land_boundary": "8 usable acres reserved for selectable onsite energy infrastructure, including resource-associated access/clearances in footprint factors. Campus buildings, ordinary cooling, shared utility substation/roads and emergency UPS/protection accommodated separately; no solar/wind field onsite.",
+  "storage_boundary_rule": "SOC0 before hour0; continuous across months/years; finalSOC0 at horizon end. Annual equivalent-cycle ceiling for each8760-hour model year, prorated by resource available hours in that year.",
+  "full_load_year_mwh": 604440,
+  "grid_delay_rule": "grid_delay_months is a nonnegative integer in submission metadata, zero for required base comparison; shift all positive milestones by this amount. Other resource dates unchanged.",
+  "initial_service_range": "Integer initial_service_month >=14 and initial_service_month+10<120 (maximum109); default20. Month30 full-demand target can be a preference or hard deadline.",
+  "clean_only_battery_note": "Common attribution convention, not physical battery restriction.",
+  "land_footprint_note": "Engine and fuel-cell equipment footprints use manufacturer context but remain fictional allowances, not engineered site layouts."
+}

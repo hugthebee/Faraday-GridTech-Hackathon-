@@ -1,0 +1,212 @@
+file,column,unit,definition,provenance
+assumptions_register.csv,parameter,field name,Parameter being described; units and scope are defined alongside it.,CASE
+assumptions_register.csv,value,parameter units,Recorded parameter value; interpret using the units/definition of that row.,CASE
+assumptions_register.csv,unit,text,Unit. See asset explanation and source register.,CASE
+assumptions_register.csv,classification,text,Observed/derived/CASE assumption or offer classification.,CASE
+assumptions_register.csv,rationale,text,Reason for the proposed assumption and its limitations.,CASE
+commissioning_ramp.csv,months_since_initial_service,model months,"Relative month of prescribed ramp; 0 at initial service, 10 at full demand. Earlier demand is zero; later demand remains full.",CASE
+commissioning_ramp.csv,load_fraction,fraction,Fraction of the entire mature facility profile applied at this ramp month; all tiers scale.,CASE
+commissioning_ramp.csv,equivalent_peak_mw,MW,"75*load_fraction; scaling reference, not a guarantee the seasonal hourly maximum occurs in each model month.",derived
+grid_connection_schedule.csv,from_month,elapsed model month,Inclusive month when this grid capacity becomes available; optional delay shifts positive-capacity rows.,CASE
+grid_connection_schedule.csv,max_import_mw,MW,Ordinary shared grid import ceiling from this date until next milestone.,CASE
+reference_hourly.csv,hour_index,integer,Zero-based interval index,derived
+reference_hourly.csv,timestamp_utc,ISO8601 UTC,Interval beginning; authoritative physical join key,ERCOT-derived
+reference_hourly.csv,timestamp_local,ISO8601 with offset,Central-time beginning; DST offsets explicit,derived
+reference_hourly.csv,interval_hours,hours,One-hour duration,CASE
+reference_hourly.csv,wind_ercot_actual_mw,MW,Observed ERCOT fleet output; four15min MWh summed,ERCOT_GEN
+reference_hourly.csv,wind_proxy_cf,fraction,Fleet wind MW / month-end operational MW,ERCOT_GEN;ERCOT_CAP
+reference_hourly.csv,solar_ercot_actual_mw,MW,Observed ERCOT fleet output; four15min MWh summed,ERCOT_GEN
+reference_hourly.csv,solar_proxy_cf,fraction,Fleet solar MW / month-end operational MW,ERCOT_GEN;ERCOT_CAP
+reference_hourly.csv,wholesale_price_usd_per_mwh,USD/MWh,LZ_SOUTH type LZ; mean of four15min prices (raw 2023 value; the model multiplies it by the wholesale trajectory in price_trajectory.json),ERCOT_PRICE
+reference_hourly.csv,grid_adder_usd_per_mwh,USD/MWh,Fictional delivered-grid service adder,CASE
+reference_hourly.csv,load_mw,MW facility AC,"Requested campus demand BEFORE response, including cooling. In reference_hourly this is mature demand; in timeline_default it is scaled by commissioning.",CASE derived
+reference_hourly.csv,henry_hub_usd_per_mmbtu,USD/MMBtu HHV,2023 monthly Henry Hub price (raw 2023 value; the model multiplies it by the Henry Hub trajectory in price_trajectory.json),EIA_GAS
+reference_hourly.csv,delivered_gas_adder_usd_per_mmbtu,USD/MMBtu HHV,Fictional delivered-fuel adder,CASE
+reference_hourly.csv,grid_co2_t_per_mwh,metric ton CO2/MWh,"ERCT annual average factor, 2023 level (the model multiplies it by the declining grid-CO2 trajectory in price_trajectory.json)",EPA_EGRID
+reference_hourly.csv,firm_clean_available_fraction,fraction,"Flat1 baseline delivery ceiling, not guaranteed uptime",CASE
+reference_hourly.csv,tier1_relocatable_mw,MW,Pre-response net local facility demand eligible to move during events; not an automatic action.,CASE
+reference_hourly.csv,tier2_interruptible_mw,MW,Pre-response demand eligible for immediate interruption during events.,CASE
+reference_hourly.csv,tier0_protected_mw,MW,"Pre-response local demand that cannot move or interrupt, including essential infrastructure.",CASE
+reference_hourly.csv,stress_event_id,identifier,Event label; none outside events. Join stress_events.csv.,CASE
+reference_hourly.csv,stress_active,0 or1,1 means the hour is inside a designated response window.,CASE
+reference_hourly.csv,stress_import_fraction,fraction,Fraction of ordinary grid capacity allowed in the hour;1 outside events.,CASE
+reference_hourly.csv,notice_minutes,minutes,Advance notice at event start; not a subhourly simulation.,CASE
+resource_options.csv,option_id,string,Stable identifier,CASE
+resource_options.csv,label,string,Display name,CASE
+resource_options.csv,kind,category,"variable, firm, dispatchable or storage",CASE
+resource_options.csv,location,category,offsite dispatch shares campus grid limit,CASE
+resource_options.csv,block_mw,MW,Final capacity must be integer multiple,CASE
+resource_options.csv,max_mw,MW,Option capacity maximum,CASE
+resource_options.csv,available_month,elapsed months,Earliest availability after authorization,CASE
+resource_options.csv,capex_usd_per_kw,2023 USD/kW,Owned equipment capital cost; contract rows zero,EIA_CAP gas/4hBESS; other nonzero CASE
+resource_options.csv,fom_usd_per_kw_year,2023 USD/kW/year,Fixed annual operating cost,EIA_CAP gas/4hBESS; other nonzero CASE
+resource_options.csv,life_years,years,Economic life for annualization,CASE
+resource_options.csv,payment_usd_per_mwh,2023 USD/MWh,Tariff or variable O&M; excludes separately modeled fuel,EIA_CAP gas VOM; other CASE
+resource_options.csv,payment_basis,category,available_generation pays curtailment; dispatched_generation pays dispatched output,CASE
+resource_options.csv,heat_rate_mmbtu_per_mwh_hhv,MMBtu/MWh HHV,Fuel used per generated MWh,EIA_CAP gas turbine; EPA_CHP gas engine; CASE fuel cell
+resource_options.csv,co2_t_per_mwh,metric ton CO2/MWh,Operational CO2 factor; heat rate*117lb/MMBtu*0.00045359237 for gas,Gas-family heat rate times 117lbCO2/MMBtu times 0.00045359237; CASE clean resources zero
+resource_options.csv,clean_credit,0 or1,Case eligibility for contract clean-energy share,CASE
+resource_options.csv,duration_hours,hours,Usable battery energy per MW;0 for nonstorage,CASE
+resource_options.csv,round_trip_efficiency,fraction,Battery RTE;1 placeholder for nonstorage,ATB_BESS
+resource_options.csv,max_cycles_per_year,equivalent cycles/year,Internal withdrawn MWh/usable MWh;0 for nonstorage,CASE
+resource_options.csv,land_acres_per_mw,acres/MW,Onsite energy footprint; offsite zero Gas-engine and fuel-cell footprints of 0.05 acre/MW are CASE allowances with manufacturer context; onsite land 8 acres.,CASE
+resource_options.csv,profile_column,string,Hourly availability column; empty=capacity limit only,CASE
+resource_options.csv,engineering_source_id,source IDs,Public context; not proof of fictional commercial offer,source_register
+resource_options.csv,commercial_source_id,source ID,All commercial menu parameters are CASE,source_register
+resource_options.csv,parameter_scope_note,text,Option-specific interpretation and scaling limits,CASE
+resource_options.csv,fuel_type,category,All three gas-family resources use delivered natural gas; fuel cell is not green hydrogen,CASE
+resource_options.csv,electrical_efficiency_hhv,fraction,Derived as3.412MMBtu/MWh divided by HHV heat rate; blank means not applicable; constant full-load screening efficiency,derived from specified heat rate
+source_register.csv,source_id,identifier,Reference key in source_register.csv; source families may use an identifier prefix.,metadata
+source_register.csv,publisher,text,Organization publishing the underlying source.,metadata
+source_register.csv,title,text,Source document/report title.,metadata
+source_register.csv,landing_url,URL,Public source landing page.,metadata
+source_register.csv,download_url,URL,Original public download address if retained; blank for notices read as webpages.,metadata
+source_register.csv,retrieved_date,YYYY-MM-DD,Date source was accessed; not the data observation date.,metadata
+source_register.csv,raw_filename,filename,Original source filename recorded for provenance; large original workbooks are not bundled.,metadata
+source_register.csv,sha256,hex digest,SHA256 of the retained original source when available; blank means no raw-source hash is claimed.,metadata
+source_register.csv,method_and_limitations,text,Transformation method and limits on what the source supports.,metadata
+stress_events.csv,event_id,identifier,Unique event label.,CASE
+stress_events.csv,start_utc,ISO8601 UTC,Inclusive event interval start.,ERCOT_NOTICE_*; UTC conversion derived
+stress_events.csv,end_utc,ISO8601 UTC,Exclusive event interval end.,ERCOT_NOTICE_*; UTC conversion derived
+stress_events.csv,start_local,ISO8601 with offset,Inclusive Central-time event start.,ERCOT_NOTICE_*; UTC conversion derived
+stress_events.csv,end_local,ISO8601 with offset,Exclusive Central-time event end.,ERCOT_NOTICE_*; UTC conversion derived
+stress_events.csv,notice_utc,ISO8601 UTC,Time the fictional response notice is available.,CASE
+stress_events.csv,duration_hours,hours,Maximum event response duration; end minus start.,ERCOT_NOTICE_*; UTC conversion derived
+stress_events.csv,import_fraction,fraction,Fictional campus allowance as a fraction of normal connection capacity.,CASE
+stress_events.csv,source_id,identifier,Reference key in source_register.csv; source families may use an identifier prefix.,CASE
+stress_events.csv,source_url,URL,Official source supporting observed timing or parameter context.,CASE
+stress_events.csv,timing_basis,text,Whether source timing is observed.,CASE
+stress_events.csv,restriction_basis,text,Distinguishes fictional campus restriction from public event timing.,CASE
+timeline_default.csv,model_hour,hour index,"Unique chronological primary key 0..87599; one hour per row, beginning at development month 0.",CASE clock
+timeline_default.csv,development_month,model month,floor(model_hour/730); availability and upgrades take effect at the start of this month.,derived
+timeline_default.csv,model_year,model year,floor(model_hour/8760)+1; years 1..10. This is not a Gregorian year.,derived
+timeline_default.csv,reference_hour,reference row index,model_hour mod 8760; row of reference_hourly.csv repeated in the timeline.,derived
+timeline_default.csv,demand_fraction,fraction of mature demand,"Zero before selected initial service, 1/3 at initial service, rising by 1/15 per model month over 10 months, then 1.",CASE commissioning ramp
+timeline_default.csv,load_mw,MW facility AC,"Requested campus demand BEFORE response, including cooling. In reference_hourly this is mature demand; in timeline_default it is scaled by commissioning.",CASE derived
+timeline_default.csv,tier0_protected_mw,MW,"Pre-response local demand that cannot move or interrupt, including essential infrastructure.",CASE
+timeline_default.csv,tier1_relocatable_mw,MW,Pre-response net local facility demand eligible to move during events; not an automatic action.,CASE
+timeline_default.csv,tier2_interruptible_mw,MW,Pre-response demand eligible for immediate interruption during events.,CASE
+timeline_default.csv,ordinary_grid_limit_mw,MW,Grid-import limit at this development date before stress reduction; includes all offsite contract delivery plus merchant electricity.,CASE grid schedule
+timeline_default.csv,effective_grid_limit_mw,MW,Ordinary grid limit times stress fraction. This is the actual shared import cap for this hour.,CASE event rule
+timeline_default.csv,stress_active,0 or1,1 means the hour is inside a designated response window.,CASE
+timeline_default.csv,stress_import_fraction,fraction,Fraction of ordinary grid capacity allowed in the hour;1 outside events.,CASE
+timeline_default.csv,notice_minutes,minutes,Advance notice at event start; not a subhourly simulation.,CASE
+timeline_default.csv,stress_event_id,identifier,Event label; none outside events. Join stress_events.csv.,CASE
+timeline_default.csv,wind_proxy_cf,fraction,Fleet wind MW / month-end operational MW,ERCOT_GEN;ERCOT_CAP
+timeline_default.csv,solar_proxy_cf,fraction,Fleet solar MW / month-end operational MW,ERCOT_GEN;ERCOT_CAP
+timeline_default.csv,firm_clean_available_fraction,fraction,"Flat1 baseline delivery ceiling, not guaranteed uptime",CASE
+timeline_default.csv,grid_co2_t_per_mwh,metric ton CO2/MWh,ERCT annual average factor declining smoothly with model_hour at the real annual rate in price_trajectory.json (-3%/yr); also scales the remote-site factor,EPA_EGRID;CASE
+timeline_default.csv,merchant_price_usd_per_mwh,2023 USD/MWh,"Wholesale historical regional price x wholesale trajectory multiplier (+5%/yr real, price_trajectory.json) plus flat service adder; charged only to residual merchant electricity, not PPA delivery.",ERCOT_PRICE;CASE
+timeline_default.csv,delivered_gas_price_usd_per_mmbtu,2023 USD/MMBtu HHV,"Henry Hub monthly price x Henry Hub trajectory multiplier (+3%/yr real, price_trajectory.json) plus flat hypothetical delivered adder.",EIA_GAS;CASE
+dispatch.csv (submission),model_hour,hour index,"Unique chronological primary key 0..87599; one hour per row, beginning at development month 0.",CASE clock
+dispatch.csv (submission),grid_mw,hourly-average MW,Residual merchant electricity only; add dispatched offsite contracts to obtain total grid imports.,submission
+dispatch.csv (submission),tier1_relocated_mw,local-equivalent MW,Local load moved to remote site during eligible stress hours; remote electricity=1.05 times this quantity.,submission
+dispatch.csv (submission),tier2_curtailed_mw,MW,Interrupted/canceled customer demand during eligible events; not curtailment of excess generation.,submission
+dispatch.csv (submission),utility_solar_mw,MW,"Actual dispatched electricity from selected utility_solar capacity, after availability/profile limits; zero before commitment start.",submission
+dispatch.csv (submission),wind_mw,MW,"Actual dispatched electricity from selected wind capacity, after availability/profile limits; zero before commitment start.",submission
+dispatch.csv (submission),battery_4h_charge_mw,MW,"AC charging input in this hour, restricted to contemporaneous clean portfolio generation.",submission
+dispatch.csv (submission),battery_4h_discharge_mw,MW,AC electricity delivered from battery in this hour.,submission
+dispatch.csv (submission),battery_4h_soc_mwh,internal MWh,"Stored energy at ENDofhour; carries across months/years, initial/final boundary defined in model rules.",submission
+dispatch.csv (submission),gas_turbine_mw,MW,"Actual dispatched electricity from selected gas_turbine capacity, after availability/profile limits; zero before commitment start.",submission
+dispatch.csv (submission),nuclear_mw,MW,"Actual dispatched electricity from selected nuclear capacity, after availability/profile limits; zero before commitment start.",submission
+dispatch.csv (submission),gas_engine_mw,MW,"Actual dispatched electricity from selected gas_engine capacity, after availability/profile limits; zero before commitment start.",submission
+dispatch.csv (submission),fuel_cell_mw,MW,"Actual dispatched electricity from selected fuel_cell capacity, after availability/profile limits; zero before commitment start.",submission
+case.json,version,text,v5.5.1 current shared exercise model.,CASE unless source explicitly identified
+case.json,status,text,Fictional shared exercise benchmark; see documented assumptions and limitations.,CASE unless source explicitly identified
+case.json,reference_year,historical calendar year,2023 observed reference profiles; not the modeled future calendar.,CASE unless source explicitly identified
+case.json,hourly_year_role,text,historical stress and screening year; not a future price forecast,CASE unless source explicitly identified
+case.json,site,text,"Fictional Williamson County, Texas campus",CASE unless source explicitly identified
+case.json,load_boundary,text,Facility AC electricity including cooling; no second PUE multiplier.,CASE unless source explicitly identified
+case.json,peak_mw,MW,75 MW mature facility peak including cooling.,CASE unless source explicitly identified
+case.json,annual_load_factor,fraction,"Mature mean divided by peak,0.92.",CASE unless source explicitly identified
+case.json,campus_ready_month,model month,"14 is earliest physical campus operation, conditional on adequate supply.",CASE unless source explicitly identified
+case.json,full_load_target_month,model month,Customer full-demand target30; teams distinguish preference from hard deadline.,CASE unless source explicitly identified
+case.json,onsite_energy_land_acres,usable acres,8 acre assumed reserved equipment envelope; footprint boundary in case.land_boundary.,CASE unless source explicitly identified
+case.json,discount_rate_real,fraction/year,8%real rate used ONLYinside capital-recovery factor; do not additionally discount the screening annualized ledger.,CASE unless source explicitly identified
+case.json,money_basis,text,2023 USD benchmark; contract prices and adders are fictional in the same dollar basis,CASE unless source explicitly identified
+case.json,grid_access[0].from_month,model month,Inclusive grid connection milestone; optional delay applies to positive capacity rows.,CASE unless source explicitly identified
+case.json,grid_access[0].max_import_mw,MW,Ordinary shared grid import capacity from milestone onward.,CASE unless source explicitly identified
+case.json,grid_access[1].from_month,model month,Inclusive grid connection milestone; optional delay applies to positive capacity rows.,CASE unless source explicitly identified
+case.json,grid_access[1].max_import_mw,MW,Ordinary shared grid import capacity from milestone onward.,CASE unless source explicitly identified
+case.json,grid_access[2].from_month,model month,Inclusive grid connection milestone; optional delay applies to positive capacity rows.,CASE unless source explicitly identified
+case.json,grid_access[2].max_import_mw,MW,Ordinary shared grid import capacity from milestone onward.,CASE unless source explicitly identified
+case.json,grid_access[3].from_month,model month,Inclusive grid connection milestone; optional delay applies to positive capacity rows.,CASE unless source explicitly identified
+case.json,grid_access[3].max_import_mw,MW,Ordinary shared grid import capacity from milestone onward.,CASE unless source explicitly identified
+case.json,grid_access_note,text,Fictional campus import limit; all offsite resources share it. Not confirmed utility service.,CASE unless source explicitly identified
+case.json,grid_co2_t_per_mwh,tCO2/MWh,"Constant ERCOT annual-average grid factor; regional proxy, not hourly or marginal.",CASE unless source explicitly identified
+case.json,egrid_co2_lb_per_mwh,lbCO2/MWh,Public annual-average ERCOT eGRID factor before metric-ton conversion.,CASE unless source explicitly identified
+case.json,grid_clean_credit,fraction,"0credit for merchant grid electricity in contractual clean-share metric, distinct from its physical mix.",CASE unless source explicitly identified
+case.json,reliability_scope,text,hourly adequacy only; UPS and emergency protection outside scope,CASE unless source explicitly identified
+case.json,storage_charge_rule,text,only from clean portfolio generation; no grid/fossil charging or storage-to-storage transfers,CASE unless source explicitly identified
+case.json,optional_constraints,list,"Explicit scope/constraint labels: unit commitment, minimum stable output, startup cost, subhourly ramping, temperature derating, degradation, stochastic outages, optimized staged capacity additions, detailed workload scheduling",CASE unless source explicitly identified
+case.json,shared_hard_constraints,list,"Explicit scope/constraint labels: hourly energy balance, resource available dates, grid import limit, resource capacity and module increments, onsite land, storage power/energy/efficiency/cycles, Tier 0 protection, event eligibility and response limits, temporary import caps, remote capacity",CASE unless source explicitly identified
+case.json,preferences,text,Teams design input and recommendation logic; objective weights are not prescribed.,CASE unless source explicitly identified
+case.json,emissions_metric_note,text,"Attributable screening CO2 indicator, not a site-specific physical inventory or marginal avoided emissions.",CASE unless source explicitly identified
+case.json,gas_connection_note,text,"Gas turbine, gas engine and natural-gas fuel cell assume delivered fuel infrastructure is ready at each resource available_month. Dates are hypothetical offers, not installation-speed or gas-connection forecasts.",CASE unless source explicitly identified
+case.json,price_geography_note,text,"LZ_SOUTH is a regional ERCOT price proxy, not a verified Williamson County settlement point.",CASE unless source explicitly identified
+case.json,load_tier_boundary,text,"Net local facility AC demand, including allocated cooling. Essential infrastructure remains protected. No extra PUE multiplier.",CASE unless source explicitly identified
+case.json,nuclear_note,text,"Hypothetical physical delivery from a new offsite plant available at month 60; 25 MW maximum and 95 USD/MWh are fictional case offers, not supplier quotations or a nuclear project-cost forecast.",CASE unless source explicitly identified
+case.json,scope,text,Chronological hourly commissioning and operation,CASE unless source explicitly identified
+case.json,horizon_months,model months,"Common120 month endpoint, exclusive; all comparisons use same end, including alternative customer starts.",CASE unless source explicitly identified
+case.json,hours_per_year,hours,8760 hours per repeated representative year and reporting/cycle period.,CASE unless source explicitly identified
+case.json,hours_per_model_month,hours,730 hour equal model month; explicitly not Gregorian or future local-clock month.,CASE unless source explicitly identified
+case.json,default_initial_service_month,model month,20 is the default occupancy start; teams may explore alternatives.,CASE unless source explicitly identified
+case.json,default_full_demand_month,model month,"30 for the default schedule, derived as opening+10 for other start months.",CASE unless source explicitly identified
+case.json,ramp_duration_months,model months,10-month fixed-shape commissioning ramp; 11 table rows including initial service and full demand.,CASE unless source explicitly identified
+case.json,initial_load_fraction,fraction,One-third mature facility demand at initial service; all tiers scale.,CASE unless source explicitly identified
+case.json,time_convention,text,120 equal model months of 730 hours. Month0 starts at model_hour0. Year 1 is months0..11. No future calendar/DST forecast implied; reference_hour=model_hour%8760.,CASE unless source explicitly identified
+case.json,profile_repetition,text,"Repeat the same2023 reference year 10 times, including stress windows. No escalation, decarbonization, weather diversification, demand randomness or probability implied.",CASE unless source explicitly identified
+case.json,cost_start_rule,text,"For each selected resource, charges and availability begin at max(initial_service_month,available_month). Capacity is selected upfront and remains committed through horizon end.",CASE unless source explicitly identified
+case.json,cost_comparison,text,"Sum common annualized capacity charges prorated by operating hours plus energy/response charges; no second discounting or terminal value. This is a cumulative screening cost, NOT project NPV.",CASE unless source explicitly identified
+case.json,commitment_rule,text,"No retirement, resale, cancellation, replacements or optional retirement credits in core model. All lives exceed ten-year horizon.",CASE unless source explicitly identified
+case.json,land_boundary,text,"8 usable acres reserved for selectable onsite energy infrastructure, including resource-associated access/clearances in footprint factors. Campus buildings, ordinary cooling, shared utility substation/roads and emergency UPS/protection accommodated separately; no solar/wind field onsite.",CASE unless source explicitly identified
+case.json,storage_boundary_rule,text,"SOC0 before hour0; continuous across months/years; finalSOC0 at horizon end. Annual equivalent-cycle ceiling for each8760-hour model year, prorated by resource available hours in that year.",CASE unless source explicitly identified
+case.json,full_load_year_mwh,MWh/year,604440 MWh at mature reference load before response.,CASE unless source explicitly identified
+case.json,grid_delay_rule,text,Nonnegative integer delay in grid_delay_months; zero for required base. Shift all positive connection milestones only.,CASE unless source explicitly identified
+case.json,initial_service_range,text,Integer initial_service_month >=14 and initial_service_month+10<120 (maximum109); default20. Month30 full-demand target can be a preference or hard deadline.,CASE unless source explicitly identified
+case.json,clean_only_battery_note,text,"Common attribution convention, not physical battery restriction.",CASE unless source explicitly identified
+case.json,land_footprint_note,text,"Engine and fuel-cell equipment footprints use manufacturer context but remain fictional allowances, not engineered site layouts.",CASE unless source explicitly identified
+response_parameters.json,classification,text,All parameters in this file are proposed CASE assumptions; not measured workload or service-offer facts.,CASE unless source explicitly identified
+response_parameters.json,tier1_base_share,fraction,"Synthetic tier-share coefficient, not observed workload data. The authoritative expanded hourly tier values are already supplied in reference_hourly.csv; no reconstruction script is needed.",CASE unless source explicitly identified
+response_parameters.json,tier1_daily_amplitude,fraction,"Synthetic tier-share coefficient, not observed workload data. The authoritative expanded hourly tier values are already supplied in reference_hourly.csv; no reconstruction script is needed.",CASE unless source explicitly identified
+response_parameters.json,tier1_weekly_amplitude,fraction,"Synthetic tier-share coefficient, not observed workload data. The authoritative expanded hourly tier values are already supplied in reference_hourly.csv; no reconstruction script is needed.",CASE unless source explicitly identified
+response_parameters.json,tier2_base_share,fraction,"Synthetic tier-share coefficient, not observed workload data. The authoritative expanded hourly tier values are already supplied in reference_hourly.csv; no reconstruction script is needed.",CASE unless source explicitly identified
+response_parameters.json,tier2_daily_amplitude,fraction,"Synthetic tier-share coefficient, not observed workload data. The authoritative expanded hourly tier values are already supplied in reference_hourly.csv; no reconstruction script is needed.",CASE unless source explicitly identified
+response_parameters.json,tier2_weekly_amplitude,fraction,"Synthetic tier-share coefficient, not observed workload data. The authoritative expanded hourly tier values are already supplied in reference_hourly.csv; no reconstruction script is needed.",CASE unless source explicitly identified
+response_parameters.json,protected_infrastructure_floor_mw,MW at mature load,"10 MW floor is already included in protected tier; scales with commissioning fraction, no extra independent load.",CASE unless source explicitly identified
+response_parameters.json,relocation_notice_minutes,minutes,30 minute guaranteed notice before affected hourly intervals; no subhourly validation implied.,CASE unless source explicitly identified
+response_parameters.json,remote_capacity_mw,remote electricity MW,12 MW receiving-site electricity capacity; local-equivalent relocation limit divides by 1.05.,CASE unless source explicitly identified
+response_parameters.json,remote_energy_multiplier,remote MWh/local MWh,1.05 remote electricity per local-equivalent MWh moved; includes assumed efficiency penalty.,CASE unless source explicitly identified
+response_parameters.json,remote_electricity_usd_per_mwh,2023 USD/remote MWh,Fictional70 USD tariff for receiving-site electricity.,CASE unless source explicitly identified
+response_parameters.json,relocation_service_usd_per_local_mwh,2023 USD/local-equivalent MWh,Fictional50 USD service premium in addition to remote electricity cost.,CASE unless source explicitly identified
+response_parameters.json,remote_co2_t_per_mwh,tCO2/remote MWh,Assumed receiving-site factor reusing regional annual average; not observed remote location.,CASE unless source explicitly identified
+response_parameters.json,interruption_consequence_usd_per_mwh,2023 USD/interrupted MWh,"1000 USD scenario consequence, not empirically measured customer revenue.",CASE unless source explicitly identified
+response_parameters.json,stress_import_fraction,fraction,0.6ofordinary import capacity during designated events; fictional campus restriction.,CASE unless source explicitly identified
+response_parameters.json,maximum_event_duration_hours,hours,Maximum consecutive event window7 hours; event table defines exact intervals.,CASE unless source explicitly identified
+response_parameters.json,tier2_max_fraction,fraction of Tier 2,Upper fraction of eligible Tier 2 that can be interrupted in event;1baseline.,CASE unless source explicitly identified
+response_parameters.json,relocation_local_rebound,boolean,False: relocated work does not return as later local demand in core.,CASE unless source explicitly identified
+response_parameters.json,tier2_rebound,boolean,"False: interrupted work is canceled, not deferred.",CASE unless source explicitly identified
+response_parameters.json,nominal_cost_rationale,text,70 USD/MWh is a rounded hypothetical remote tariff near the existing66.62 USD/MWh merchant-only load-weighted comparator;50 USD/MWh service premium is not empirically observed.,CASE unless source explicitly identified
+response_parameters.json,remote_emissions_rationale,text,Same annual grid factor as local proxy; no claim about a real remote region.,CASE unless source explicitly identified
+response_parameters.json,notice_scope,text,Notice available30 minutes before event; all eligible actions apply for full hourly intervals; no unannounced/subhourly test.,CASE unless source explicitly identified
+response_parameters.json,remote_availability_scope,text,Remote capacity assumed available throughout local events; no remote network model.,CASE unless source explicitly identified
+response_parameters.json,tier2_scope,text,Canceled/interrupted service with a consequence charge; not deferred work awaiting completion.,CASE unless source explicitly identified
+response_parameters.json,tier_scope,text,Tier columns are net avoidable local AC MW; essential residual overhead is included in Tier 0.,CASE unless source explicitly identified
+portfolio.json (submission),initial_service_month,elapsed model month,"Selected customer service month; integer >=14 and <=109, full demand=start+10<120. Grid/resource dates remain development-anchored.",team output under shared rules
+portfolio.json (submission),grid_delay_months,model months,Optional nonnegative integer delay to all positive grid milestones;0 for required base.,team output under shared rules
+portfolio.json (submission),capacities_mw,mapping of option ID to MW,"Selected committed capacities, not hourly dispatch. Omitted IDs mean zero. Must respect blocks, maxima and reserved land.",team output under shared rules
+data_dictionary.csv,file,text,Asset filename or submitted output name.,documentation
+data_dictionary.csv,column,text,CSV field name or JSON dotted/indexed path.,documentation
+data_dictionary.csv,unit,text,Unit and dimensional meaning.,documentation
+data_dictionary.csv,definition,text,"Human-readable meaning, boundary and use.",documentation
+data_dictionary.csv,provenance,text,"Public, derived, fictionalCASE or submission classification.",documentation
+portfolio.json (submission),capacities_mw.utility_solar,MW selected nameplate,"Offsite utility-solar contract capacity. Optional nested JSON property; if omitted, zero. Selected quantity must respect resource_options.csv capacity blocks, maxima and onsite land where applicable.",team output under shared rules
+portfolio.json (submission),capacities_mw.wind,MW selected nameplate,"Offsite wind contract capacity. Optional nested JSON property; if omitted, zero. Selected quantity must respect resource_options.csv capacity blocks, maxima and onsite land where applicable.",team output under shared rules
+portfolio.json (submission),capacities_mw.battery_4h,MW selected nameplate,"Four-hour onsite battery power rating capacity. Optional nested JSON property; if omitted, zero. Selected quantity must respect resource_options.csv capacity blocks, maxima and onsite land where applicable.",team output under shared rules
+portfolio.json (submission),capacities_mw.gas_turbine,MW selected nameplate,"Onsite natural-gas turbine capacity. Optional nested JSON property; if omitted, zero. Selected quantity must respect resource_options.csv capacity blocks, maxima and onsite land where applicable.",team output under shared rules
+portfolio.json (submission),capacities_mw.nuclear,MW selected nameplate,"Future offsite nuclear physical supply capacity. Optional nested JSON property; if omitted, zero. Selected quantity must respect resource_options.csv capacity blocks, maxima and onsite land where applicable.",team output under shared rules
+portfolio.json (submission),capacities_mw.gas_engine,MW selected nameplate,"Onsite natural-gas engine capacity. Optional nested JSON property; if omitted, zero. Selected quantity must respect resource_options.csv capacity blocks, maxima and onsite land where applicable.",team output under shared rules
+portfolio.json (submission),capacities_mw.fuel_cell,MW selected nameplate,"Onsite natural-gas fuel cell capacity. Optional nested JSON property; if omitted, zero. Selected quantity must respect resource_options.csv capacity blocks, maxima and onsite land where applicable.",team output under shared rules
+price_trajectory.json,annual_real_rates.henry_hub,fraction per year,"Real annual growth of the Henry Hub gas price; multiplier = (1+rate)^(model_hour/8760), 1.0 at model_hour 0",EIA_GAS;CASE
+price_trajectory.json,annual_real_rates.wholesale_energy,fraction per year,Real annual growth of the wholesale component of merchant electricity price (adder excluded),ERCOT_PRICE;CASE
+price_trajectory.json,annual_real_rates.grid_co2,fraction per year,Annual change of the grid emission factor for merchant and remote-site electricity (negative = decline),EPA_EGRID;CASE

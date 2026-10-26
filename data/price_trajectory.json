@@ -1,0 +1,34 @@
+{
+  "version": "v5.5.1",
+  "classification": "CASE assumption: smooth real-terms (constant 2023 USD) trajectories applied to the repeating 2023 reference-year hourly shapes. A transparent screening scenario, not a forecast.",
+  "method": "For model_hour h, multiplier = (1 + annual_real_rate) ** (h / 8760). Anchor: model_hour 0 equals the 2023 reference level (multiplier 1.0). Applied identically to every opening month because the trajectory follows development time, like grid and resource dates. Hourly shape (price spikes, price/renewable coincidence, stress-event hours) is preserved from the 2023 reference year.",
+  "annual_real_rates": {
+    "henry_hub": 0.03,
+    "wholesale_energy": 0.05,
+    "grid_co2": -0.03
+  },
+  "applies_to": {
+    "henry_hub": "Henry Hub component of delivered gas price only: delivered_gas = henry_hub * multiplier + delivered_gas_adder (adder stays flat, real).",
+    "wholesale_energy": "Wholesale price component of merchant electricity only: merchant = wholesale * multiplier + grid_adder (the 20 USD/MWh service adder stays flat, real).",
+    "grid_co2": "Grid emission factor for merchant electricity AND the remote receiving site (remote_co2_t_per_mwh), which response_parameters.json defines as the same annual grid factor."
+  },
+  "unchanged": "Contract prices (solar, wind, nuclear), equipment costs, the 70 USD/MWh remote tariff, the 50 USD/MWh relocation service charge and the 1,000 USD/MWh interruption consequence are all fixed in 2023 USD. Fixed-price contracts therefore gain value relative to merchant and gas as the horizon progresses.",
+  "implied_year_10_multipliers": {
+    "henry_hub": 1.344,
+    "wholesale_energy": 1.629,
+    "grid_co2": 0.737
+  },
+  "rationale": {
+    "henry_hub": "EIA AEO2025 Reference case: Henry Hub rises from 2.88 to 4.80 USD/MMBtu (real 2024 USD) between 2025 and 2050, about 2.1%/yr. EIA STEO (2026) has the 2026-27 spot price around 3.2-3.7 USD/MMBtu nominal, already above the 2023 average of about 2.5. 3%/yr starts at the 2023 level and converges toward those levels, reaching about 3.4 USD/MMBtu real by year 10.",
+    "wholesale_energy": "Modo Energy ERCOT Market Outlook (Oct 2026, real 2025 USD) projects around-the-clock prices rising from about 36 USD/MWh in 2027 to a peak near 150 USD/MWh in 2032 as data-center load tightens supply, with long-run prices near 72 USD/MWh. EIA (2026) also flags ERCOT as the region most exposed to data-center load growth. 5%/yr real is a deliberately smooth, moderate scenario well below that peak, ending near 73 USD/MWh average wholesale by year 10.",
+    "grid_co2": "ERCOT carbon intensity fell from about 1,206 lb/MWh (2010) to about 850 (2019) and the packet's 2023 eGRID value is 734 lb/MWh, roughly -3.5% to -4%/yr. -3%/yr is slightly conservative given data-center load growth, ending near 0.245 t/MWh (about 540 lb/MWh) by year 10."
+  },
+  "sources": [
+    "https://www.eia.gov/todayinenergy/detail.php?id=65724 (EIA AEO2025 Henry Hub projection)",
+    "https://www.eia.gov/outlooks/steo/ (EIA Short-Term Energy Outlook, Henry Hub 2026-27)",
+    "https://modoenergy.com/research/en/ercot-market-outlook-q3-2026-bess-revenue-demand-generation-capacity-prices-october (Modo Energy ERCOT outlook, Oct 2026)",
+    "https://www.eia.gov/TodayinEnergy/detail.php?id=67344 (EIA: data-center load and ERCOT wholesale prices)",
+    "https://www.uh.edu/energy/_docs/low-carbon-electricity-grid-slides.pdf (ERCOT CO2 intensity 2010-2019)"
+  ],
+  "tuning_note": "Change the three annual_real_rates to test other scenarios. The checker and prepare_inputs() read this file, so the same values flow into accounting. Update the file's SHA-256 in starter/check_submission.py after editing."
+}
