@@ -1,0 +1,1 @@
+model_hour,grid_mw,tier1_relocated_mw,tier2_curtailed_mw,utility_solar_mw,wind_mw,battery_4h_charge_mw,battery_4h_discharge_mw,battery_4h_soc_mwh,gas_turbine_mw,nuclear_mw,gas_engine_mw,fuel_cell_mw

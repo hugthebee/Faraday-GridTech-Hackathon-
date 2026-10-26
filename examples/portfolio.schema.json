@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "initial_service_month",
+    "grid_delay_months",
+    "capacities_mw"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "initial_service_month": {
+      "type": "integer",
+      "minimum": 14,
+      "maximum": 109
+    },
+    "grid_delay_months": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "capacities_mw": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "utility_solar": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 150.0,
+          "multipleOf": 5.0
+        },
+        "wind": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 200.0,
+          "multipleOf": 5.0
+        },
+        "battery_4h": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 12.0,
+          "multipleOf": 1.0
+        },
+        "gas_turbine": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100.0,
+          "multipleOf": 25.0
+        },
+        "nuclear": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 25.0,
+          "multipleOf": 5.0
+        },
+        "gas_engine": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 60.0,
+          "multipleOf": 5.0
+        },
+        "fuel_cell": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 30.0,
+          "multipleOf": 5.0
+        }
+      }
+    }
+  }
+}
